@@ -1,0 +1,18 @@
+{
+    "name": "aethletic/telegram-api",
+    "description": "Telegram Bot Api Library",
+    "type": "library",
+    "license": "MIT",
+    "require-dev": {
+        "aethletic/database": "*"
+    },
+    "require": {
+        "adbario/php-dot-notation": "^2.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Botify\\": "src/"
+        },
+        "files": ["src/helpers.php"]
+    }
+}
