@@ -1,3 +1,4 @@
 vendor
 old
 composer.lock
+examples/bot.php
