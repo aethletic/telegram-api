@@ -1,6 +1,6 @@
 <?php
 
-namespace Telegram\Util;
+namespace Telegram;
 
 use Illuminate\Support\Arr;
 

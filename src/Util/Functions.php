@@ -99,3 +99,10 @@ if (!function_exists('plural')) {
         return (new Helpers)->plural($n, $forms);
     }
 }
+
+if (!function_exists('lang')) {
+    function lang($code, $replace = null)
+    {
+        return Bot::getInstance()->lang($code, $replace);
+    }
+}

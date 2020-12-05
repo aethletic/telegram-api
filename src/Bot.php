@@ -2,11 +2,9 @@
 
 namespace Telegram;
 
-use GuzzleHttp\Client as Http;
 use Curl\Curl;
 use Telegram\Exception\BotException;
 use Telegram\Util\Helpers;
-use Telegram\Util\Keyboard;
 use Telegram\Traits\Request;
 use Telegram\Traits\Telegram;
 use Telegram\Traits\Router;
@@ -53,6 +51,23 @@ class Bot
     private const TELEGRAM_API_FILE = 'https://api.telegram.org/file/bot';
 
     /**
+     * @var Helpers
+     */
+    public $helper;
+
+    /**
+     * @var Keyboard
+     */
+    public $keyboard;
+
+    private $mappedMethods = [];
+
+    /**
+     * @var Localization
+     */
+    private $lang;
+
+    /**
      * @param string $token
      */
     public function create(string $token = null, array $config = [])
@@ -67,8 +82,16 @@ class Bot
         $this->helper = new Helpers();
         $this->keyboard = new Keyboard();
 
-        $this->setUpdate();
+        if ($this->config('localization.enable')) {
+            $defaultLang = $this->config('localization.default_language', 'en');
+            $this->lang = (new Localization())
+                ->setDefault($defaultLang)
+                ->setLanguage($this->update('*.from.language_code', $defaultLang))
+                ->load();
+        }
 
+        $this->setUpdate();
+        
         return $this;
     }
 
@@ -85,6 +108,11 @@ class Bot
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    public function lang($code = null, $replace = null)
+    {
+        return !$code ? $this->lang : $this->lang->get($code, $replace);
     }
 
     public function keyboard($keyboard = false, $oneTime = false, $resize = true)
@@ -137,6 +165,21 @@ class Bot
         return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) ? head($data) : $data);
     }
 
+    public function loading(array $elements = [], $delay = 1)
+    {
+        $messageId = false;
+        while ($element = array_shift($elements)) { 
+            if (!$messageId) {
+                $result = say($element)->get('result');
+                $messageId = $result['message_id'];
+            } else {
+                $this->editMessageText($messageId, $this->update('*.chat.id'), $element);
+            }
+            usleep(round($delay * 1000000));
+        }
+        return true;
+    }
+
     /**
      * Check update exists.
      *
@@ -178,5 +221,20 @@ class Bot
     private function getRequestUrl($method = null)
     {
         return self::TELEGRAM_API_URL . "{$this->token}/{$method}";
+    }
+
+    public function map($method, $func)
+    {
+        $this->mappedMethods[$method] = $func;
+    }
+
+    public function mapOnce($method, $func)
+    {
+        $this->mappedMethods[$method] = $this->execute($func);
+    }
+
+    public function __call($method, $args) {
+        $tmp = $this->mappedMethods[$method];
+        return is_callable($tmp) ? $this->execute($tmp, $args) : $tmp;
     }
 }

@@ -4,3 +4,4 @@ composer.lock
 examples/bot.php
 examples/config.php
 examples/run.php
+examples/localization
