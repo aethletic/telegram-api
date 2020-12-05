@@ -6,6 +6,7 @@ use GuzzleHttp\Client as Http;
 use Curl\Curl;
 use Telegram\Exception\BotException;
 use Telegram\Util\Helpers;
+use Telegram\Util\Keyboard;
 use Telegram\Traits\Request;
 use Telegram\Traits\Telegram;
 use Telegram\Traits\Router;
@@ -64,6 +65,7 @@ class Bot
         $this->config = collect($this->config)->merge($config);
         $this->curl = new Curl();
         $this->helper = new Helpers();
+        $this->keyboard = new Keyboard();
 
         $this->setUpdate();
 
@@ -83,6 +85,14 @@ class Bot
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    public function keyboard($keyboard = false, $oneTime = false, $resize = true)
+    {
+        if (!$keyboard) {
+            return $this->keyboard->hide();
+        }
+        return $this->keyboard->show($keyboard, $oneTime, $resize);
     }
 
     /**
@@ -162,6 +172,11 @@ class Bot
 
     private function execute($func, $args = [])
     {
-        return call_user_func_array($func, $args);
+        return $func ? call_user_func_array($func, $args) : false;
+    }
+
+    private function getRequestUrl($method = null)
+    {
+        return self::TELEGRAM_API_URL . "{$this->token}/{$method}";
     }
 }

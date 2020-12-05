@@ -23,7 +23,7 @@ trait Request
         }
     }
 
-    private function buildRequestParams(array $params = [], array $keyboard = null, array $extra = [])
+    private function buildRequestParams($params = [], $keyboard = null, $extra = [])
     {
         if ($keyboard) {
             $params['reply_markup'] = $keyboard;
@@ -32,10 +32,5 @@ trait Request
         $params['parse_mode'] = $this->config('telegram.parse_mode', 'html');
 
         return array_merge($params, $extra);
-    }
-
-    private function getRequestUrl($method = null)
-    {
-        return self::TELEGRAM_API_URL . "{$this->token}/{$method}";
     }
 }

@@ -34,18 +34,18 @@ class Helpers
     // $n = 42, $forms = ['арбуз', 'арбуза', 'арбузов']
     public function plural($n, $forms)
     {
-        return is_float($n)?$forms[1]:($n%10==1&&$n%100!=11?$forms[0]:($n%10>=2&&$n%10<=4&&($n%100<10||$n%100>=20)?$forms[1]:$forms[2]));
+        return is_float($n) ? $forms[1] : ($n % 10 == 1 && $n % 100 != 11 ? $forms[0] : ($n % 10 >= 2 && $n % 10 <= 4 && ($n % 100 < 10 || $n % 100 >= 20) ? $forms[1] : $forms[2]));
     }
 
     public function pluralEng($value, $phrase)
     {
-        $plural='';
-        if ($value>1) {
-            for ($i=0;$i<strlen($phrase);$i++) {
-                if ($i==strlen($phrase)-1) {
-                    $plural.=($phrase[$i]=='y')? 'ies':(($phrase[$i]=='s'|| $phrase[$i]=='x' || $phrase[$i]=='z' || $phrase[$i]=='ch' || $phrase[$i]=='sh')? $phrase[$i].'es' :$phrase[$i].'s');
+        $plural = '';
+        if ($value > 1) {
+            for ($i = 0; $i < strlen($phrase); $i++) {
+                if ($i == strlen($phrase) - 1) {
+                    $plural .= ($phrase[$i] == 'y') ? 'ies' : (($phrase[$i] == 's' || $phrase[$i] == 'x' || $phrase[$i] == 'z' || $phrase[$i] == 'ch' || $phrase[$i] == 'sh') ? $phrase[$i] . 'es' : $phrase[$i] . 's');
                 } else {
-                    $plural.=$phrase[$i];
+                    $plural .= $phrase[$i];
                 }
             }
             return $plural;
@@ -62,7 +62,7 @@ class Helpers
     // like 2020-02-02 00:00:00
     public function midnight($timestamp = false)
     {
-      $timestamp = $timestamp ? $timestamp : time();
-      return strtotime(date('Y-m-d', $timestamp) . ' midnight');
+        $timestamp = $timestamp ? $timestamp : time();
+        return strtotime(date('Y-m-d', $timestamp) . ' midnight');
     }
 }

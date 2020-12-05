@@ -115,8 +115,7 @@ trait Router
 
     public function middleware($names = [])
     {
-        $names = (array) $names;
-        foreach ($names as $name) {
+        foreach ((array)$names as $name) {
             if ($this->middlewarePassed === false) {
                 continue;
             }
@@ -124,6 +123,7 @@ trait Router
             $next = isset($this->middlewares[$name]) ? call_user_func($this->middlewares[$name]) : false;
             $next = is_bool($next) ? $next : false;
             $this->middlewarePassed = $next;
+   
         }
 
         return $this;
