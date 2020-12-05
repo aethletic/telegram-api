@@ -2,6 +2,8 @@
 
 namespace Telegram\Traits;
 
+use Illuminate\Support\Arr;
+
 trait Router
 {
     private $middlewares = [];
@@ -22,15 +24,32 @@ trait Router
             return false;
         }
 
-        $data = (array) $data;
+        foreach ((array) $data as $key => $value) {
 
-        foreach ($data as $key => $value) {
-            // обычный on без значения
+            /**
+             * Формат: 
+             * [
+             *   ['*.text' => '/qwe/i'],
+             *   ['*.text' => '/asd/i'],
+             * ]
+             */ 
+            if (is_numeric($key) && is_array($value)) {
+                $this->on($value, $func);
+                continue;
+            }
+
+            /**
+             * Формат: 
+             * ['*.text', '*.sticker']
+             */
             if (is_numeric($key) && $this->update($value, false)) {
                 return $this->execute($func);
             }
 
-            // on со значением
+             /**
+             * Формат: 
+             * ['*.text' => 'hello']
+             */
             if (!$found = $this->update($key, false)) {
                 continue;
             }
@@ -49,10 +68,21 @@ trait Router
         }
     }
 
+    // public function hear($messages, $func) {
+    //     if ($this->isMessage() || $this->isEditedMessage()) {
+    //         if (!$this->isCommand() && !$this->isCallback()) {
+    //             $data = collect($messages)->mapWithKeys(function ($item) {
+    //                 return ['*.text' => $item];
+    //             })->toArray();
+    //             return $this->on($data, $func);
+    //         }
+    //     }
+    // }
+
     public function hear($messages, $func) {
         if ($this->isMessage() || $this->isEditedMessage()) {
             if (!$this->isCommand() && !$this->isCallback()) {
-                $data = collect($messages)->mapWithKeys(function ($item) {
+                $data = collect($messages)->map(function ($item) {
                     return ['*.text' => $item];
                 })->toArray();
                 return $this->on($data, $func);
@@ -62,7 +92,7 @@ trait Router
 
     public function command($messages, $func) {
         if ($this->isCommand() && !$this->isCallback()) {
-            $data = collect($messages)->mapWithKeys(function ($item) {
+            $data = collect($messages)->map(function ($item) {
                 return ['*.text' => $item];
             })->toArray();
             return $this->on($data, $func);
@@ -71,7 +101,7 @@ trait Router
 
     public function callback($messages, $func) {
         if ($this->isCallback()) {
-            $data = collect($messages)->mapWithKeys(function ($item) {
+            $data = collect($messages)->map(function ($item) {
                 return ['callback_query.data' => $item];
             })->toArray();
             return $this->on($data, $func);

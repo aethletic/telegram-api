@@ -4,16 +4,6 @@ namespace Telegram\Util;
 
 class Helpers
 {
-    public function bootstrap($dirs)
-    {
-      foreach ($dirs as $dir) {
-          $files = glob($dir);
-          foreach ($files as $file) {
-              require_once $file;
-          }
-      }
-    }
-
     public function shuffle($message)
     {
         preg_match_all('/{{(.+?)}}/mi', $message, $sentences);

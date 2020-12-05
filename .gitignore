@@ -2,3 +2,4 @@ vendor
 old
 composer.lock
 examples/bot.php
+examples/config.php

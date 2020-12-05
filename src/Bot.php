@@ -18,6 +18,8 @@ class Bot
     use Telegram;
     use Events;
 
+    private static $instance = null;
+
     /**
      * Telegram Bot Token.
      *
@@ -48,11 +50,11 @@ class Bot
 
     private const TELEGRAM_API_URL = 'https://api.telegram.org/bot';
     private const TELEGRAM_API_FILE = 'https://api.telegram.org/file/bot';
-    
+
     /**
      * @param string $token
      */
-    public function __construct(string $token = null, array $config = [])
+    public function create(string $token = null, array $config = [])
     {
         if (!$token) {
             new BotException("Please, pass your bot token.");
@@ -64,6 +66,23 @@ class Bot
         $this->helper = new Helpers();
 
         $this->setUpdate();
+
+        return $this;
+    }
+
+    private function __clone()
+    {
+    }
+    private function __construct()
+    {
+    }
+
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
     /**
@@ -74,7 +93,7 @@ class Bot
      * @param mixed $default
      * @return Collection|mixed
      */
-    public function config($key = null, $default = null) 
+    public function config($key = null, $default = null)
     {
         if (!$key && !$default) {
             return $this->update;
@@ -93,7 +112,7 @@ class Bot
      * @param mixed $default
      * @return Collection|mixed
      */
-    public function update($key = null, $default = null) 
+    public function update($key = null, $default = null)
     {
         if (!$this->isUpdate()) {
             return false;
@@ -130,7 +149,7 @@ class Bot
 
         $updateId = -1;
 
-        while(true) {
+        while (true) {
             foreach ($this->getUpdates($updateId + 1, 1)->get('result') as $update) {
                 $start = microtime(true);
                 $this->update = collect($update);
