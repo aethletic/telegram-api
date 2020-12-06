@@ -9,6 +9,8 @@ use Telegram\Traits\Request;
 use Telegram\Traits\Telegram;
 use Telegram\Traits\Router;
 use Telegram\Traits\Events;
+use Telegram\Database\Database;
+use Illuminate\Database\Capsule\Manager as Capsule;
 
 class Bot
 {
@@ -68,6 +70,11 @@ class Bot
     private $lang;
 
     /**
+     * @var Illuminate\Database\Capsule\Manager
+     */
+    private $db;
+
+    /**
      * @param string $token
      */
     public function create(string $token = null, array $config = [])
@@ -82,6 +89,12 @@ class Bot
         $this->helper = new Helpers();
         $this->keyboard = new Keyboard();
 
+        // база данных
+        if ($this->config('database.enable')) {
+            $this->db = Database::connect();
+        }
+
+        // локализация
         if ($this->config('localization.enable')) {
             $defaultLang = $this->config('localization.default_language', 'en');
             $this->lang = (new Localization())
@@ -91,7 +104,7 @@ class Bot
         }
 
         $this->setUpdate();
-        
+
         return $this;
     }
 
@@ -108,6 +121,11 @@ class Bot
             self::$instance = new self();
         }
         return self::$instance;
+    }
+
+    public function db($table = null)
+    {
+        return !$table ? $this->db : $this->db->table($table);
     }
 
     public function lang($code = null, $replace = null)
@@ -186,7 +204,7 @@ class Bot
     }
 
     /**
-     * Send laoding message.
+     * Send loading message.
      * 
      * @param array $elements Array with text, will be sent from index 0
      * @param integer|boolean $delay
@@ -195,7 +213,7 @@ class Bot
     public function loading(array $elements = [], $delay = 1)
     {
         $messageId = false;
-        while ($element = array_shift($elements)) { 
+        while ($element = array_shift($elements)) {
             if (!$messageId) {
                 $result = say($element)->get('result');
                 $messageId = $result['message_id'];
@@ -231,8 +249,19 @@ class Bot
 
     public function setUpdate($update = null)
     {
+        // из лонгпула или дебаг режима
+        if ($update) {
+            $this->update = $this->helper()->isJson($update) ? collect(json_decode($update, true)) : collect($update);
+            return;
+        }
+
         $input = file_get_contents('php://input');
         $this->update = $input ? collect(json_decode($input, true)) : false;
+    }
+
+    public function helper()
+    {
+        return $this->helper;
     }
 
     public function longpoll($func)
@@ -243,11 +272,12 @@ class Bot
 
         while (true) {
             foreach ($this->getUpdates($updateId + 1, 1)->get('result') as $update) {
-                $start = microtime(true);
-                $this->update = collect($update);
+                $start = microtime(true); // dev debug
+                $this->setUpdate($update);
                 $updateId = $this->update('update_id', -1);
                 $this->execute($func, [$this]);
-                echo PHP_EOL . round(microtime(true) - $start, 5);
+                $this->run();
+                echo PHP_EOL . round(microtime(true) - $start, 5); // dev debug
             }
         }
     }
@@ -272,7 +302,8 @@ class Bot
         $this->mappedMethods[$method] = $this->execute($func);
     }
 
-    public function __call($method, $args) {
+    public function __call($method, $args)
+    {
         $tmp = $this->mappedMethods[$method];
         return is_callable($tmp) ? $this->execute($tmp, $args) : $tmp;
     }

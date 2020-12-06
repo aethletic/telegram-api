@@ -14,6 +14,7 @@ class Helpers
 
         foreach ($sentences[1] as $words) {
             $words_array = explode('|', $words);
+            $words_array = array_map('trim', $words_array);
             $select = $words_array[array_rand($words_array)];
             $message = str_ireplace('{{' . $words . '}}', $select, $message);
         }
@@ -51,6 +52,20 @@ class Helpers
             return $plural;
         }
         return $phrase;
+    }
+
+    /**
+     * Is RTL
+     * Check if there RTL characters (Arabic, Persian, Hebrew)
+     * 
+     * @author	Khaled Attia <sourcecode@khal3d.com>
+     * @param	String	$string
+     * @return	bool
+     */
+    public function isRtl($string)
+    {
+        $rtl_chars_pattern = '/[\x{0590}-\x{05ff}\x{0600}-\x{06ff}]/u';
+        return preg_match($rtl_chars_pattern, $string);
     }
 
     public function random($arr)

@@ -94,9 +94,9 @@ if (!function_exists('action')) {
 }
 
 if (!function_exists('dice')) {
-    function dice($chatId, $emoji = '🎲', $keyboard = null, $extra = [])
+    function dice($emoji = '🎲', $keyboard = null, $extra = [])
     {
-        return Bot::getInstance()->dice($chatId, $emoji, $keyboard, $extra);
+        return Bot::getInstance()->dice($emoji, $keyboard, $extra);
     }
 }
 
@@ -111,5 +111,12 @@ if (!function_exists('lang')) {
     function lang($code, $replace = null)
     {
         return Bot::getInstance()->lang($code, $replace);
+    }
+}
+
+if (!function_exists('helper')) {
+    function helper()
+    {
+        return Bot::getInstance()->helper();
     }
 }

@@ -73,7 +73,7 @@ trait Telegram
         ], null, $extra));
     }
 
-    public function dice($chatId, $emoji = '🎲', $keyboard = null, $extra = [])
+    public function dice($emoji = '🎲', $keyboard = null, $extra = [])
     {
         return $this->sendDice($this->update('*.chat.id'), $emoji, $keyboard, $extra);
     }
@@ -209,6 +209,7 @@ trait Telegram
         $emoji = str_ireplace(['darts', 'dart', 'дротик', 'дартс'], '🎯', $emoji);
         $emoji = str_ireplace(['basketball', 'баскетбол'], '🏀', $emoji);
         $emoji = str_ireplace(['football', 'футбол'], '⚽️', $emoji);
+        $emoji = str_ireplace(['777', 'slot', 'slots', 'слоты', 'слот', 'казино'], '🎰', $emoji);
 
         return $this->request(__FUNCTION__, $this->buildRequestParams([
             'chat_id' => $chatId,

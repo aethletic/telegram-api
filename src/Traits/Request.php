@@ -16,7 +16,7 @@ trait Request
         $this->curl->post($this->getRequestUrl($method), $params);
 
          if ($this->curl->error) {
-            echo 'Error code ' . $this->curl->errorCode . ': ' . $this->curl->errorMessage . "\n";
+            echo "\n\nError code " . $this->curl->errorCode . ': ' . $this->curl->errorMessage . "\n\n";
             var_dump($this->getRequestUrl($method), $params);
         } else {
             return collect(json_decode(json_encode($this->curl->response), true));
@@ -31,6 +31,6 @@ trait Request
 
         $params['parse_mode'] = $this->config('telegram.parse_mode', 'html');
 
-        return array_merge($params, $extra);
+        return array_merge($params, (array) $extra);
     }
 }

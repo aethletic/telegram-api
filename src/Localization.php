@@ -2,8 +2,6 @@
 
 namespace Telegram;
 
-use Exception;
-
 class Localization 
 {
     private $language;
