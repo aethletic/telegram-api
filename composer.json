@@ -6,7 +6,8 @@
     "require": {
         "guzzlehttp/guzzle": "^7.0",
         "laravel/helpers": "^1.4",
-        "php-curl-class/php-curl-class": "^8.9"
+        "php-curl-class/php-curl-class": "^8.9",
+        "illuminate/database": "^8.17"
     },
     "autoload": {
         "psr-4": {
