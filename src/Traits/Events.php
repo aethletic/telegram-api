@@ -206,4 +206,49 @@ trait Events
     {
         return $this->update('*.chat.type', false) == 'private';
     }
+
+    public function isNewVersion()
+    {
+        if (!$this->db || !$this->user) {
+            return;
+        }
+
+        return $this->user()->isNewVersion;
+    }
+
+    public function isNewUser()
+    {
+        if (!$this->db || !$this->user) {
+            return;
+        }
+
+        return $this->user()->isNewUser;
+    }
+
+    public function isSpam()
+    {
+        if (!$this->db || !$this->user) {
+            return;
+        }
+
+        return $this->user()->isSpam;
+    }
+
+    public function isBanned()
+    {
+        if (!$this->db || !$this->user) {
+            return;
+        }
+
+        return $this->user()->isBanned;
+    }
+
+    public function isUpdated()
+    {
+        if (!$this->db || !$this->user) {
+            return;
+        }
+
+        return $this->user()->isUpdated;
+    }
 }

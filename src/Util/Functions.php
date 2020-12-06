@@ -120,3 +120,18 @@ if (!function_exists('helper')) {
         return Bot::getInstance()->helper();
     }
 }
+
+if (!function_exists('store')) {
+    function store($key = null, $value = null)
+    {
+        if ($key && is_null($value)) {
+            return Bot::getInstance()->store()->get($key);
+        }
+
+        if ($key && !is_null($value)) {
+            return Bot::getInstance()->store()->set($key, $value);
+        }
+
+        return Bot::getInstance()->store();
+    }
+}

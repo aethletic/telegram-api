@@ -5,9 +5,9 @@ namespace Telegram\Database;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Telegram\Bot;
 
-class Database
+class Connector
 {
-    public static function connect()
+    public static function create()
     {
         $bot = Bot::getInstance();
 

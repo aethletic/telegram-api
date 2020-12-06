@@ -9,8 +9,7 @@ use Telegram\Traits\Request;
 use Telegram\Traits\Telegram;
 use Telegram\Traits\Router;
 use Telegram\Traits\Events;
-use Telegram\Database\Database;
-use Illuminate\Database\Capsule\Manager as Capsule;
+use Telegram\Database\Connector;
 
 class Bot
 {
@@ -75,6 +74,16 @@ class Bot
     private $db;
 
     /**
+     * @var Store
+     */
+    private $store;
+
+    /**
+     * @var User
+     */
+    private $user;
+
+    /**
      * @param string $token
      */
     public function create(string $token = null, array $config = [])
@@ -88,10 +97,21 @@ class Bot
         $this->curl = new Curl();
         $this->helper = new Helpers();
         $this->keyboard = new Keyboard();
+        $this->store = new Store();
+
+        date_default_timezone_set($this->config('general.timezone', 'UTC'));
 
         // база данных
         if ($this->config('database.enable')) {
-            $this->db = Database::connect();
+            $this->db = Connector::create();
+
+            if ($this->config('database.collect_statistics') && $this->isUpdate()) {
+                Statistics::collect();
+            }
+
+            if ($this->isUpdate()) {
+                $this->user = new User($this->update('*.from.id'), true);
+            }
         }
 
         // локализация
@@ -123,9 +143,27 @@ class Bot
         return self::$instance;
     }
 
+    public function store($key = null, $value = null)
+    {
+        if ($key && is_null($value)) {
+            return $this->store->get($key);
+        }
+
+        if ($key && !is_null($value)) {
+            return $this->store->set($key, $value);
+        }
+
+        return $this->store;
+    }
+
     public function db($table = null)
     {
         return !$table ? $this->db : $this->db->table($table);
+    }
+
+    public function user()
+    {
+        return $this->user;
     }
 
     public function lang($code = null, $replace = null)
@@ -163,7 +201,7 @@ class Bot
 
         $data = data_get($this->config->toArray(), $key, $default);
         $data = is_array($data) ? array_filter($data) : $data;
-        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) ? head($data) : $data);
+        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) && $data !== [] ? head($data) : $data);
     }
 
     /**
@@ -187,7 +225,7 @@ class Bot
 
         $data = data_get($this->update->toArray(), $key, $default);
         $data = is_array($data) ? array_filter($data) : $data;
-        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) ? head($data) : $data);
+        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) && $data !== [] ? head($data) : $data);
     }
 
     /**
@@ -250,6 +288,8 @@ class Bot
     public function setUpdate($update = null)
     {
         // из лонгпула или дебаг режима
+        // isJson слишком медленно отрабатывает
+        // по возможности избегать передачи $update
         if ($update) {
             $this->update = $this->helper()->isJson($update) ? collect(json_decode($update, true)) : collect($update);
             return;
@@ -273,10 +313,33 @@ class Bot
         while (true) {
             foreach ($this->getUpdates($updateId + 1, 1)->get('result') as $update) {
                 $start = microtime(true); // dev debug
-                $this->setUpdate($update);
+
+                $this->update = collect($update);
                 $updateId = $this->update('update_id', -1);
+
+                /**
+                 * Перед выполнением событий
+                 * Только самое необходимое
+                 */
+                if (!is_null($this->db)) {
+                    $this->user = new User($this->update('*.from.id'), true);
+                }
+
+                /**
+                 * Регистрация и выполнение событий
+                 */
                 $this->execute($func, [$this]);
                 $this->run();
+
+                /**
+                 * После выполнения событий, чтобы не тормозить ответ бота
+                 */
+                if (!is_null($this->db)) {
+                    if ($this->config('database.collect_statistics')) {
+                        Statistics::collect();
+                    }
+                }
+
                 echo PHP_EOL . round(microtime(true) - $start, 5); // dev debug
             }
         }

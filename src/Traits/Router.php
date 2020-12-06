@@ -7,6 +7,8 @@ trait Router
     private $middlewares = [];
     private $middlewarePassed = null;
     private $middlewareCurrent = null;
+    private $defaultBotAnswer = null;
+
     private $queue = [];
 
     private function check()
@@ -85,8 +87,17 @@ trait Router
         $this->middlewareCurrent = null;
     }
 
+    public function setDefaultAnswer($func)
+    {
+        $this->defaultBotAnswer = $func;
+    }
+
     public function run()
     {
+        if ($this->queue === [] && !$this->isSpam()) {
+            return !is_null($this->defaultBotAnswer) ? $this->execute($this->defaultBotAnswer) : null;
+        }
+
         foreach ($this->queue as $event) {
 
             // если есть middleware, выполняем проверку
