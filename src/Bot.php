@@ -115,6 +115,11 @@ class Bot
         return !$code ? $this->lang : $this->lang->get($code, $replace);
     }
 
+    public function curl()
+    {
+        return new Curl;
+    }
+
     public function keyboard($keyboard = false, $oneTime = false, $resize = true)
     {
         if (!$keyboard) {
@@ -126,6 +131,7 @@ class Bot
     /**
      * Return instance of Collection if call like config()
      * Pass params for get value from array use dot notation.
+     * Can call as `config()` function.
      * 
      * @param string|null $key
      * @param mixed $default
@@ -145,6 +151,7 @@ class Bot
     /**
      * Return instance of Collection if call like update()
      * Pass params for get value from array use dot notation.
+     * Can call as `update()` function.
      * 
      * @param string|null $key
      * @param mixed $default
@@ -165,6 +172,26 @@ class Bot
         return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) ? head($data) : $data);
     }
 
+    /**
+     * Alias for `update` method.
+     * Can call as `get()` function.
+     *
+     * @param string|null $key
+     * @param mixed $default
+     * @return Collection|mixed
+     */
+    public function get($key = null, $default = null)
+    {
+        return $this->update($key, $default);
+    }
+
+    /**
+     * Send laoding message.
+     * 
+     * @param array $elements Array with text, will be sent from index 0
+     * @param integer|boolean $delay
+     * @return boolean
+     */
     public function loading(array $elements = [], $delay = 1)
     {
         $messageId = false;
@@ -177,6 +204,18 @@ class Bot
             }
             usleep(round($delay * 1000000));
         }
+        return true;
+    }
+
+    /**
+     * Just wait some time, sipport milliseconds.
+     *
+     * @param integer|boolean $delay
+     * @return boolean
+     */
+    public function wait($delay = 1)
+    {
+        usleep(round($delay * 1000000));
         return true;
     }
 

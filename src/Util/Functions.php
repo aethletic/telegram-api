@@ -51,6 +51,13 @@ if (!function_exists('update')) {
     }
 }
 
+if (!function_exists('get')) {
+    function get($key = null, $default = null)
+    {
+        return Bot::getInstance()->get($key, $default);
+    }
+}
+
 if (!function_exists('config')) {
     function config($key = null, $default = null)
     {
