@@ -16,7 +16,7 @@ $bot->middleware('admin')
 
 ## Methods
 
-### `addMiddleware(string $name, $function) : void`
+#### `addMiddleware(string $name, $function) : void`
 
 The function or method of the class that is passed as the second parameter must return `TRUE` or `FALSE`.
 
@@ -38,7 +38,7 @@ $bot->addMiddleware('middleware.name', function () {
 });
 ```
 
-### `middleware(string|array $name) : Bot`
+#### `middleware(string|array $name) : Bot`
 
 Method `middleware()` should always be done before the event.
 
