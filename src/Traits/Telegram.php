@@ -161,6 +161,15 @@ trait Telegram
         ], $keyboard, $extra), true);
     }
 
+    public function sendVideo($chatId, $video, $caption = '', $keyboard = null, $extra = [])
+    {
+        return $this->request(__FUNCTION__, $this->buildRequestParams([
+            'chat_id' => $chatId,
+            'caption' => $caption,
+            'video' => $video,
+        ], $keyboard, $extra), true);
+    }
+
     public function sendVideoNote($chatId, $videoNote, $keyboard = null, $extra = [])
     {
         return $this->request(__FUNCTION__, $this->buildRequestParams([

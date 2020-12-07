@@ -156,3 +156,10 @@ if (!function_exists('log')) {
         return $data ? Bot::getInstance()->log()->write($data, $type) : Bot::getInstance()->log();
     }
 }
+
+if (!function_exists('upload_file')) {
+    function upload_file($path = false)
+    {
+        return Bot::getInstance()->helper()->upload($path);
+    }
+}

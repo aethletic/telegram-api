@@ -80,4 +80,9 @@ class Helpers
         $timestamp = $timestamp ? $timestamp : time();
         return strtotime(date('Y-m-d', $timestamp) . ' midnight');
     }
+
+    public function upload($path = false)
+    {
+        return $path ? new \CURLFile($path) : false;
+    }
 }
