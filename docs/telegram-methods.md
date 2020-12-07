@@ -269,10 +269,10 @@ $active = $bot->isActive(1234567890);
 Support name generator:
 
 ```php
-$bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{basename}');
-$bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{md5}.{extension}');
-$bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{random_name}');
-$bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{time}.{extension}');
+$bot->saveFile($fileUrlFormGetFileMethod, './storage/{basename}');
+$bot->saveFile($fileUrlFormGetFileMethod, './storage/{md5}.{extension}');
+$bot->saveFile($fileUrlFormGetFileMethod, './storage/{random_name}');
+$bot->saveFile($fileUrlFormGetFileMethod, './storage/{time}.{extension}');
 ```
 
 Available tags:
