@@ -1,6 +1,5 @@
 # Middleware
 
-### Example
 This is simple example of middleware:
 ```php 
 // register middleware
