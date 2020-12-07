@@ -46,7 +46,7 @@ $bot->addMiddleware('middleware.name', function () {
 
 Method `middleware()` should always be done before the event.
 
-**Supported methods:**
+**Supported events:**
 * `on()`
 * `hear()`
 * `command()`
