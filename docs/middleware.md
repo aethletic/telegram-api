@@ -14,6 +14,8 @@ $bot->middleware('admin')
     });
 ```
 
+## Methods
+
 ### `addMiddleware(string $name, $function) : void`
 
 The function or method of the class that is passed as the second parameter must return `TRUE` or `FALSE`.
