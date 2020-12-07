@@ -75,6 +75,8 @@ $bot->on([
     });
 ```
 
+---
+
 #### `hear(string|array $text, $function) : void`
 This method only catches **text messages** and **edited messages**.
 
@@ -101,6 +103,8 @@ $bot->hear(['/hello/i', 'sup bro'], function () {
     say('Hello again 👋');
 });
 ```
+
+---
 
 #### `command(string|array $command, $function) : void`
 This method only catches **command messages**.
@@ -134,6 +138,8 @@ $bot->hear(['/\/keyboard/i', '/buttons'], function () {
     ]));
 });
 ```
+
+---
 
 #### `hear(string|array $callback_data, $function) : void`
 This method only catches **callback query**.
