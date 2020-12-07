@@ -2,6 +2,8 @@
 
 > **NOTE:** The `$extra` parameter contains all additional Telegram methods that are not passed directly to the method. Method parameters can also be overwritten in this array.
 
+---
+
 #### `setWebhook([string $url, array $extra = ['max_connections' => 100]]) : Response`
 Method in the Telegram documentation [**here**](https://core.telegram.org/bots/api#setwebhook).
 
@@ -278,8 +280,7 @@ Available tags:
 * `{extension}` - file extension like `jpg`, `mp3`, etc... **without dot**;
 * `{time}` - current timestamp;
 * `{md5}` - result of `md5(time().mt_rand())`;
-* `{random_name}` - result of `md5(time().mt_rand()) . ".{$extension}"`;
-* 
+* `{random_name}` - result of `md5(time().mt_rand()).".{$extension}"`;
 
 ---
 
