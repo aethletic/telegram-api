@@ -18,11 +18,13 @@ $bot->middleware('admin')
 
 #### `addMiddleware(string $name, $function) : void`
 
-The function or method of the class that is passed as the second parameter must return `TRUE` or `FALSE`.
+The function or method of the class that is passed as the second parameter must return `true` or `false`.
 
-`TRUE` - if passed successfully.
+Return `true` in case the event is allowed to execute.
 
-`FALSE` - if not passed.
+Return `false` in case, it is forbidden to execute the event.
+
+**Examples:**
 
 ```php 
 // passed
@@ -47,6 +49,8 @@ Method `middleware()` should always be done before the event.
 * `hear()`
 * `command()`
 * `callback()`
+
+**Examples:**
 
 ```php 
 $bot->middleware('middleware.name')
