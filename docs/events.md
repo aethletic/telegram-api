@@ -149,6 +149,7 @@ This method only catches **callback query**.
 **Examples:**
 
 First, let's agree that we send an inline keyboard:
+
 ```php
 say('Inline keyboard', keyboard([
     [
@@ -157,6 +158,8 @@ say('Inline keyboard', keyboard([
     ]
 ]));
 ```
+
+Now, we can start handling key presses:
 
 ```php
 $bot->callback('show_video', function () use ($bot) {

@@ -67,10 +67,12 @@ trait Telegram
 
     public function action($action = 'typing', $extra = [])
     {
-        return $this->request('sendAction', $this->buildRequestParams([
+        return $this->request('sendChatAction', $this->buildRequestParams([
             'chat_id' => $this->update('*.chat.id'),
             'action' => $action,
         ], null, $extra));
+
+        return $this;
     }
 
     public function dice($emoji = '🎲', $keyboard = null, $extra = [])
@@ -80,15 +82,15 @@ trait Telegram
 
     public function isActive($chatId, $action = 'typing', $extra = [])
     {
-        return $this->request('sendAction', $this->buildRequestParams([
+        return $this->request('sendChatAction', $this->buildRequestParams([
             'chat_id' => $chatId,
             'action' => $action,
         ], null, $extra))->get('ok', false);
     }
 
-    public function sendAction($chatId, $action = 'typing', $extra = [])
+    public function sendChatAction($chatId, $action = 'typing', $extra = [])
     {
-        return $this->request(__FUNCTION__, $this->buildRequestParams([
+        return $this->request('', $this->buildRequestParams([
             'chat_id' => $chatId,
             'action' => $action,
         ], null, $extra));
@@ -218,7 +220,7 @@ trait Telegram
         $emoji = str_ireplace(['darts', 'dart', 'дротик', 'дартс'], '🎯', $emoji);
         $emoji = str_ireplace(['basketball', 'баскетбол'], '🏀', $emoji);
         $emoji = str_ireplace(['football', 'футбол'], '⚽️', $emoji);
-        $emoji = str_ireplace(['777', 'slot', 'slots', 'слоты', 'слот', 'казино'], '🎰', $emoji);
+        $emoji = str_ireplace(['777', 'slot', 'slots', 'casino', 'слоты', 'слот', 'казино'], '🎰', $emoji);
 
         return $this->request(__FUNCTION__, $this->buildRequestParams([
             'chat_id' => $chatId,
@@ -244,13 +246,12 @@ trait Telegram
 
     public function saveFile($fileUrl, $savePath)
     {
-        $extension = stripos(basename($fileUrl), '.') !== false ? end(explode('.', basename($fileUrl))) : '';
+        $extension = strpos(basename($fileUrl), '.') !== false ? end(explode('.', basename($fileUrl))) : '';
         $savePath = str_ireplace(['{ext}', '{extension}', '{file_ext}'], $extension, $savePath);
         $savePath = str_ireplace(['{base}', '{basename}', '{base_name}', '{name}'], basename($fileUrl), $savePath);
         $savePath = str_ireplace(['{time}'], time(), $savePath);
         $savePath = str_ireplace(['{md5}'], md5(time().mt_rand()), $savePath);
         $savePath = str_ireplace(['{rand}','{random}','{rand_name}','{random_name}'], md5(time().mt_rand()) . ".$extension", $savePath);
-        $savePath = str_ireplace(['{base}', '{basename}', '{base_name}', '{name}'], basename($fileUrl), $savePath);
 
         file_put_contents($savePath, file_get_contents($this->buildRequestFileUrl($fileUrl)));
 
