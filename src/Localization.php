@@ -59,4 +59,14 @@ class Localization
         $text = $this->data[$code];
         return $replace ? strtr($text, $replace) : $text;
     }
+
+    public function autoload()
+    {
+        $defaultLang = $this->bot->config('localization.default_language', 'en');
+        $language = $this->bot->user() && $this->bot->db() ? $this->bot->user()->get('lang', 'en') : $this->bot->update('*.from.language_code', $defaultLang);
+        return $this
+                ->setDefault($defaultLang)
+                ->setLanguage($language)
+                ->load();
+    }
 }

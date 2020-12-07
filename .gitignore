@@ -5,3 +5,6 @@ examples/bot.php
 examples/config.php
 examples/run.php
 examples/localization
+examples/components
+examples/logs
+examples/store

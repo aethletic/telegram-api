@@ -135,3 +135,24 @@ if (!function_exists('store')) {
         return Bot::getInstance()->store();
     }
 }
+
+if (!function_exists('user')) {
+    function user($userId = null)
+    {
+        return Bot::getInstance()->user($userId);
+    }
+}
+
+if (!function_exists('db')) {
+    function db($table = null)
+    {
+        return Bot::getInstance()->db($table);
+    }
+}
+
+if (!function_exists('log')) {
+    function log($data = false, $type = 'info')
+    {
+        return $data ? Bot::getInstance()->log()->write($data, $type) : Bot::getInstance()->log();
+    }
+}

@@ -49,7 +49,7 @@ class User
 
             $this->isBanned = $this->data->get('banned') == 1;
 
-            if ($this->bot->config('database.user_auto_update')) {
+            if ($this->bot->config('database.user_auto_update.enable') && strtolower($this->bot->config('database.user_auto_update.method', 'before'))) {
                 $this->autoUpdateUserData();
             }
 
@@ -174,7 +174,7 @@ class User
         }
     }
 
-    private function autoUpdateUserData()
+    public function autoUpdateUserData()
     {
         $fromData = Arr::only($this->bot->update('*.from'), ['username', 'first_name', 'last_name']);
         $data = array_values(array_filter(Arr::only($this->data->toArray(), ['username', 'firstname', 'lastname'])));

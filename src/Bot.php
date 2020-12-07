@@ -84,6 +84,16 @@ class Bot
     private $user;
 
     /**
+     * @var Cache
+     */
+    private $cache;
+
+    /**
+     * @var Log
+     */
+    private $log;
+
+    /**
      * @param string $token
      */
     public function create(string $token = null, array $config = [])
@@ -94,13 +104,16 @@ class Bot
 
         $this->token = $token;
         $this->config = collect($this->config)->merge($config);
-        $this->curl = new Curl();
-        $this->helper = new Helpers();
-        $this->keyboard = new Keyboard();
-        $this->store = new Store();
 
         date_default_timezone_set($this->config('general.timezone', 'UTC'));
 
+        // регистрируем обязательные классы
+        $this->curl = new Curl();
+        $this->helper = new Helpers();
+        $this->keyboard = new Keyboard();
+        
+        $this->setUpdate();
+        
         // база данных
         if ($this->config('database.enable')) {
             $this->db = Connector::create();
@@ -111,19 +124,27 @@ class Bot
 
             if ($this->isUpdate()) {
                 $this->user = new User($this->update('*.from.id'), true);
+                $this->state = new State;
             }
         }
 
         // локализация
-        if ($this->config('localization.enable')) {
-            $defaultLang = $this->config('localization.default_language', 'en');
-            $this->lang = (new Localization())
-                ->setDefault($defaultLang)
-                ->setLanguage($this->update('*.from.language_code', $defaultLang))
-                ->load();
+        $this->lang = $this->isUpdate() ? (new Localization())->autoload() : new Localization();
+
+        // cache
+        if ($this->config('cache.enable')) {
+            $this->cache = (new Cache)($this->config('cache'));
         }
 
-        $this->setUpdate();
+        // log
+        if ($this->config('log.enable')) {
+            $this->log = new Log($this->config('log.dir'));
+        }
+
+        // store в самом конце т.к. он может зависеть от бд, в перспективе от кеша?
+        $this->store = new Store($this->config('store'));
+
+        $this->loadComponents();
 
         return $this;
     }
@@ -158,12 +179,34 @@ class Bot
 
     public function db($table = null)
     {
+        if (!$this->db) {
+            return false;
+        }
         return !$table ? $this->db : $this->db->table($table);
     }
 
-    public function user()
+    public function state($name = null, $data = null)
     {
-        return $this->user;
+        if ($name || $data) {
+            return $this->state->set($name, $data);
+        }
+
+        return $this->state;
+    }
+
+    public function user($userId = null)
+    {
+        return !$userId ? $this->user : $this->user->getDataById($userId);
+    }
+
+    public function cache()
+    {
+        return $this->cache;
+    }
+
+    public function log()
+    {
+        return $this->log;
     }
 
     public function lang($code = null, $replace = null)
@@ -184,6 +227,25 @@ class Bot
         return $this->keyboard->show($keyboard, $oneTime, $resize);
     }
 
+    private function loadComponents()
+    {
+        $components = $this->config()->get('components');
+
+        if (!$components) {
+            return false;
+        }
+
+        foreach ($components as $key => $component) {
+            if (!$component['enable'] ?? null) {
+                continue;
+            }
+
+            if (file_exists($component['entry_point'] ?? null)) {
+                require_once $component['entry_point'];
+            }
+        }
+    }
+
     /**
      * Return instance of Collection if call like config()
      * Pass params for get value from array use dot notation.
@@ -196,7 +258,7 @@ class Bot
     public function config($key = null, $default = null)
     {
         if (!$key && !$default) {
-            return $this->update;
+            return $this->config;
         }
 
         $data = data_get($this->config->toArray(), $key, $default);
@@ -290,6 +352,7 @@ class Bot
         // из лонгпула или дебаг режима
         // isJson слишком медленно отрабатывает
         // по возможности избегать передачи $update
+        // TODO: сделать второй параметр isJson?
         if ($update) {
             $this->update = $this->helper()->isJson($update) ? collect(json_decode($update, true)) : collect($update);
             return;
@@ -323,7 +386,10 @@ class Bot
                  */
                 if (!is_null($this->db)) {
                     $this->user = new User($this->update('*.from.id'), true);
+                    $this->state = new State;
                 }
+
+                $this->lang = (new Localization)->autoload();
 
                 /**
                  * Регистрация и выполнение событий
@@ -338,10 +404,21 @@ class Bot
                     if ($this->config('database.collect_statistics')) {
                         Statistics::collect();
                     }
+
+                    if ($this->config('database.user_auto_update.enable') && strtolower($this->config('database.user_auto_update.method', 'after'))) {
+                        $this->user()->autoUpdateUserData();
+                    }
                 }
 
                 echo PHP_EOL . round(microtime(true) - $start, 5); // dev debug
             }
+        }
+    }
+
+    private function autoLogWrite($name = 'AUTO')
+    {
+        if ($this->isUpdate()) {
+            $this->log()->write($this->update()->toArray(), 'AUTO');
         }
     }
 

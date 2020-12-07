@@ -18,7 +18,7 @@ class Migration
                 $table->text('fullname')->nullable();
                 $table->text('firstname')->nullable();
                 $table->string('lastname')->nullable();
-                $table->longText('username')->nullable();
+                $table->string('username')->nullable();
                 $table->string('lang', 3);
                 $table->string('role')->nullable();
                 $table->string('nickname')->nullable();
@@ -29,12 +29,20 @@ class Migration
                 $table->bigInteger('ban_date_from')->nullable();
                 $table->bigInteger('ban_date_to')->nullable();
                 $table->text('state_name')->nullable();
-                $table->longText('state_data')->nullable();
+                $table->mediumText('state_data')->nullable();
                 $table->string('source')->nullable();
                 $table->string('version');
                 $table->bigInteger('first_message');
                 $table->bigInteger('last_message');
-                $table->longText('note')->nullable();
+                $table->mediumText('note')->nullable();
+            });
+        }
+
+        if (!$schema->hasTable('store')) {
+            $schema->create('store', function ($table) {
+                $table->bigInteger('user_id')->nullable(); // задел на будущее, если хранение будет по юзерам отдельно
+                $table->text('name');
+                $table->mediumText('value')->nullable();
             });
         }
         
@@ -71,6 +79,7 @@ class Migration
         $schema = Bot::getInstance()->db()->schema();
         
         $schema->dropIfExists('users');
+        $schema->dropIfExists('store');
         $schema->dropIfExists('stats_new_users');
         $schema->dropIfExists('stats_messages');
         $schema->dropIfExists('messages');

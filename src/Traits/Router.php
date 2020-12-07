@@ -95,6 +95,7 @@ trait Router
     public function run()
     {
         if ($this->queue === [] && !$this->isSpam()) {
+            $this->autoLogWrite('AUTO_DEFAULT_ANSWER');
             return !is_null($this->defaultBotAnswer) ? $this->execute($this->defaultBotAnswer) : null;
         }
 
@@ -117,6 +118,7 @@ trait Router
 
         // очищаем очередь, актуально для лонгпула
         $this->queue = [];
+        $this->autoLogWrite('AUTO');
     }
 
     public function hear($messages, $func)
