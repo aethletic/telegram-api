@@ -268,17 +268,18 @@ Support name generator:
 
 ```php
 $bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{basename}');
+$bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{md5}.{extension}');
+$bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{random_name}');
+$bot->saveFile($fileUrlFormGetFileMethod, './you/storage/dir/{time}.{extension}');
 ```
 
 Available tags:
-```php
-$extension = strpos(basename($fileUrl), '.') !== false ? end(explode('.', basename($fileUrl))) : '';
-$savePath = str_ireplace(['{ext}', '{extension}', '{file_ext}'], $extension, $savePath);
-$savePath = str_ireplace(['{base}', '{basename}', '{base_name}', '{name}'], basename($fileUrl), $savePath);
-$savePath = str_ireplace(['{time}'], time(), $savePath);
-$savePath = str_ireplace(['{md5}'], md5(time().mt_rand()), $savePath);
-$savePath = str_ireplace(['{rand}','{random}','{rand_name}','{random_name}'], md5(time().mt_rand()) . ".$extension", $savePath);
-```
+* `{basename}` - orignal file name from response;
+* `{extension}` - file extension like `jpg`, `mp3`, etc... **without dot**;
+* `{time}` - current timestamp;
+* `{md5}` - result of `md5(time().mt_rand())`;
+* `{random_name}` - result of `md5(time().mt_rand()) . ".{$extension}"`;
+* 
 
 ---
 
