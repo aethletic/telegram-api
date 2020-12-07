@@ -29,6 +29,7 @@ The first parameter `$data`, is a string or array that supports **dot notation**
 > **NOTE:** `Regex` available only as value and `dot notation` available only as key.
 
 **Examples:**
+
 Execute event if the update has a `sticker` key in `message` array.
 ```php
 $bot->on('message.sticker', fn() => say('I love stickers! ❤'));
@@ -39,7 +40,7 @@ Execute event if the update has a `sticker` or `voice` key in `message` array.
 $bot->on(['message.voice', 'message.sticker'], fn() => say('I love stickers and voices!'));
 ```
 
-Execute event if the update has a `text` key with value `Hello` in *any* array.
+Execute event if the update has a `text` key with value `Hello` in **any** array.
 ```php
 $bot->on(['*.text' => 'Hello'], fn() => say('Hello World 🌎'));
 ```
@@ -67,7 +68,7 @@ You can combine:
 ```php
 $bot->on([
         ['*.text' => '/hello/i'], // only array for comparison value
-        'message.sticker', // string suppor
+        'message.sticker', // string support
         ['message.voice'], // array support
     ], function () {
         /* do something */
