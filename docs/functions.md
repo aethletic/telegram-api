@@ -48,6 +48,46 @@ Bot::getInstance()->user()->get('username');
 
 ---
 
+#### `say($text, $keyboard = null, $extra = [])`
+
+This is short alias for `$bot->say()` method.
+
+You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#saytext-keyboard--null-extra----response).
+
+---
+
+#### `reply($text, $keyboard = null, $extra = [])`
+
+This is short alias for `$bot->reply()` method.
+
+You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#replytext-keyboard--null-extra----response).
+
+---
+
+#### `notify($text, $showAlert = false, $extra = [])`
+
+This is short alias for `$bot->notify()` method.
+
+You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#notifytext-showalert--false-extra----response).
+
+---
+
+#### `action($action = 'typing', $extra = [])`
+
+This is short alias for `$bot->action()` method.
+
+You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#diceemoji---keyboard--null-extra----response).
+
+---
+
+#### `dice($emoji = '🎲', $keyboard = null, $extra = [])`
+
+This is short alias for `$bot->dice()` method.
+
+You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#actionaction--typing-extra----bot).
+
+---
+
 #### `update($key = null, $default = null)`
 Returns an `update` [collection](https://laravel.com/docs/8.x/collections) if you pass empty parameters, otherwise, if you pass parameters, it will return the result of the update selection.
 
@@ -63,51 +103,11 @@ $updateId = update()->get('update_id');
 ```
 
 > **NOTE:** `update()` return object of [Laravel Collection](https://laravel.com/docs/8.x/collections).
-
----
-
-#### `say($text, $keyboard = null, $extra = [])`
-
-This is short alias for `$bot->say()` method.
-
-You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#saytext-keyboard--null-extra----response)
-
----
-
-#### `reply($text, $keyboard = null, $extra = [])`
-
-This is short alias for `$bot->reply()` method.
-
-You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#replytext-keyboard--null-extra----response)
-
----
-
-#### `notify($text, $showAlert = false, $extra = [])`
-
-This is short alias for `$bot->notify()` method.
-
-You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#notifytext-showalert--false-extra----response)
-
----
-
-#### `action($action = 'typing', $extra = [])`
-
-This is short alias for `$bot->action()` method.
-
-You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#diceemoji---keyboard--null-extra----response)
-
----
-
-#### `dice($emoji = '🎲', $keyboard = null, $extra = [])`
-
-This is short alias for `$bot->dice()` method.
-
-You can see [examples here](https://github.com/aethletic/telegram-api/blob/master/docs/telegram-methods.md#actionaction--typing-extra----bot)
-
+> 
 ---
 
 #### `get($key = null, $default = null)`
-This is just short alias for `update()` alias.
+This is just short alias for `update()` function.
 
 ---
 
