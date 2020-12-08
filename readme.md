@@ -20,3 +20,6 @@ php hello_world.php
 Now, open your bot in Telegram and send message `Hello`.
 
 **More awesome examples see [here](https://google.ru).**
+
+### Documentation
+See documentation [here](https://github.com/aethletic/telegram-api/tree/master/docs).
