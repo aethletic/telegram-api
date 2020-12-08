@@ -7,7 +7,11 @@ trait Router
     private $middlewares = [];
     private $middlewarePassed = null;
     private $middlewareCurrent = null;
+
     private $defaultBotAnswer = null;
+    private $defaultBotMessageAnswer = null;
+    private $defaultBotCommandAnswer = null;
+    private $defaultBotCallbackAnswer = null;
 
     private $queue = [];
 
@@ -91,12 +95,41 @@ trait Router
     {
         $this->defaultBotAnswer = $func;
     }
+    public function setDefaultMessageAnswer($func)
+    {
+        $this->defaultBotMessageAnswer = $func;
+    }
+    public function setDefaultCommandAnswer($func)
+    {
+        $this->defaultBotCommandAnswer = $func;
+    }
+    public function setDefaultCallbackAnswer($func)
+    {
+        $this->defaultBotCallbackAnswer = $func;
+    }
 
     public function run()
     {
         if ($this->queue === [] && !$this->isSpam()) {
-            $this->autoLogWrite('AUTO_DEFAULT_ANSWER');
-            return !is_null($this->defaultBotAnswer) ? $this->execute($this->defaultBotAnswer) : null;
+            if ($this->isMessage() && !$this->isCommand() && !is_null($this->defaultBotMessageAnswer)) {
+                $this->execute($this->defaultBotMessageAnswer);
+                return $this->autoLogWrite('AUTO_DEFAULT_MESSAGE_ANSWER');
+            }
+
+            if ($this->isCommand() && !is_null($this->defaultBotCommandAnswer)) {
+                $this->execute($this->defaultBotCommandAnswer);
+                return $this->autoLogWrite('AUTO_DEFAULT_COMMAND_ANSWER');
+            }
+
+            if ($this->isCallback() && !is_null($this->defaultBotCallbackAnswer)) {
+                $this->execute($this->defaultBotCallbackAnswer);
+                return $this->autoLogWrite('AUTO_DEFAULT_CALLBACK_ANSWER');
+            }
+
+            if (!is_null($this->defaultBotAnswer)) {
+                $this->execute($this->defaultBotAnswer);
+                return $this->autoLogWrite('AUTO_DEFAULT_ANSWER');
+            }
         }
 
         foreach ($this->queue as $event) {

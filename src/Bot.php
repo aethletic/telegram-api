@@ -113,11 +113,12 @@ class Bot
         $this->keyboard = new Keyboard();
         
         $this->setUpdate();
+        $this->decodeCallback();
         
         // база данных
         if ($this->config('database.enable')) {
             $this->db = Connector::create();
-
+            // TODO вынести все в run чтобы при вебхуке не томрозило
             if ($this->config('database.collect_statistics') && $this->isUpdate()) {
                 Statistics::collect();
             }
@@ -142,7 +143,7 @@ class Bot
         }
 
         // store в самом конце т.к. он может зависеть от бд, в перспективе от кеша?
-        $this->store = new Store($this->config('store'));
+        $this->store = new Store($this->config()->get('store'));
 
         $this->loadComponents();
 
@@ -263,7 +264,7 @@ class Bot
 
         $data = data_get($this->config->toArray(), $key, $default);
         $data = is_array($data) ? array_filter($data) : $data;
-        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) && $data !== [] ? head($data) : $data);
+        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) && $data !== [] ? head($data) : ($data == [] ? $default : $data));
     }
 
     /**
@@ -287,7 +288,7 @@ class Bot
 
         $data = data_get($this->update->toArray(), $key, $default);
         $data = is_array($data) ? array_filter($data) : $data;
-        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) && $data !== [] ? head($data) : $data);
+        return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) && $data !== [] ? head($data) : ($data == [] ? $default : $data));
     }
 
     /**
@@ -325,6 +326,44 @@ class Bot
         return true;
     }
 
+    private function decodeCallback()
+    {
+        if (!$this->isUpdate()) {
+            return;
+        }
+
+        if (!$this->isCallback()) {
+            return;
+        }
+
+        $method = $this->config('telegram.safe_callback_method');
+
+        if (!$method) {
+            return;
+        }
+
+        $update = $this->update()->toArray();
+
+        $data = $update['callback_query']['data'] ?? false;
+
+        if (!$data) {
+            return;
+        }
+
+        switch (strtolower($method)) {
+            case 'encode':
+                $data = gzinflate(base64_decode($data));
+                break;
+            case 'hash':
+                // code...
+                break;
+        }
+
+        $update['callback_query']['data'] = $data;
+        
+        $this->update = collect($update);
+    }
+
     /**
      * Just wait some time, sipport milliseconds.
      *
@@ -347,19 +386,17 @@ class Bot
         return !is_bool($this->update);
     }
 
-    public function setUpdate($update = null)
+    public function setUpdate($update = null, $isJson = false)
     {
-        // из лонгпула или дебаг режима
-        // isJson слишком медленно отрабатывает
-        // по возможности избегать передачи $update
-        // TODO: сделать второй параметр isJson?
         if ($update) {
-            $this->update = $this->helper()->isJson($update) ? collect(json_decode($update, true)) : collect($update);
+            $this->update = $isJson ? collect(json_decode($update, true)) : collect($update);
+            $this->decodeCallback();
             return;
         }
 
         $input = file_get_contents('php://input');
         $this->update = $input ? collect(json_decode($input, true)) : false;
+        $this->decodeCallback();
     }
 
     public function helper()
@@ -377,7 +414,7 @@ class Bot
             foreach ($this->getUpdates($updateId + 1, 1)->get('result') as $update) {
                 $start = microtime(true); // dev debug
 
-                $this->update = collect($update);
+                $this->setUpdate($update);
                 $updateId = $this->update('update_id', -1);
 
                 /**
@@ -417,7 +454,7 @@ class Bot
 
     private function autoLogWrite($name = 'AUTO')
     {
-        if ($this->isUpdate()) {
+        if ($this->isUpdate() && $this->log) {
             $this->log()->write($this->update()->toArray(), 'AUTO');
         }
     }

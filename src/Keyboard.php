@@ -50,6 +50,24 @@ class Keyboard
         if (!is_array($keyboard)) {
             $keyboard = self::$keyboards[$keyboard];
         }
+        
+        if ($method = Bot::getInstance()->config('telegram.safe_callback_method')) {
+            switch (strtolower($method)) {
+                case 'encode':
+                    foreach ($keyboard as &$item) {
+                        $item = array_map(function ($value) {
+                            if (isset($value['callback_data'])) {
+                                $value['callback_data'] = base64_encode(gzdeflate($value['callback_data'], 9));
+                            } 
+                            return $value;
+                        }, $item);
+                    }
+                    break;
+                case 'hash':
+                    // code...
+                    break;
+            }
+        }
 
         return json_encode(['inline_keyboard' => $keyboard]);
     }

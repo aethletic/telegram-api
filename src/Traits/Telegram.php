@@ -34,7 +34,7 @@ trait Telegram
     public function say($text, $keyboard = null, $extra = [])
     {
         return $this->sendMessage(
-            $this->update('*.chat.id'),
+            $this->update('*.chat.id', $this->update('*.from.id')),
             $this->helper->shuffle($text),
             $keyboard,
             $extra
@@ -44,7 +44,7 @@ trait Telegram
     public function reply($text, $keyboard = null, $extra = [])
     {
         return $this->sendMessage(
-            $this->update('*.chat.id'),
+            $this->update('*.chat.id', $this->update('*.from.id')),
             $this->helper->shuffle($text),
             $keyboard,
             array_merge($extra, ['reply_to_message_id' => $this->update('*.message_id')])
@@ -68,7 +68,7 @@ trait Telegram
     public function action($action = 'typing', $extra = [])
     {
         return $this->request('sendChatAction', $this->buildRequestParams([
-            'chat_id' => $this->update('*.chat.id'),
+            'chat_id' => $this->update('*.chat.id', $this->update('*.from.id')),
             'action' => $action,
         ], null, $extra));
 
@@ -77,7 +77,7 @@ trait Telegram
 
     public function dice($emoji = '🎲', $keyboard = null, $extra = [])
     {
-        return $this->sendDice($this->update('*.chat.id'), $emoji, $keyboard, $extra);
+        return $this->sendDice($this->update('*.chat.id', $this->update('*.from.id')), $emoji, $keyboard, $extra);
     }
 
     public function isActive($chatId, $action = 'typing', $extra = [])
