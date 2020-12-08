@@ -145,7 +145,7 @@ $bot->action('typing')
     ->say('Yes, I was typing...');
 ```
 ```php
-$bot->action('upload_photo')
+action('upload_photo')
     ->sendPhoto(...);
 ```
 

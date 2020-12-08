@@ -65,7 +65,7 @@ $bot->middleware(['user', 'can.edit.post'])
     ->hear(/* something */);
 ```
 
-> **NOTE:** If middleware `user` returns `FALSE`, then the following middlewares will be skipped and the event will not be executed.
+> **NOTE:** If middleware `user` returns `false`, then the following middlewares will be skipped and the event will not be executed.
 
 Fallback functions if middleware not passed:
 ```php 

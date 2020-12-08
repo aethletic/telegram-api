@@ -8,7 +8,7 @@ $bot->on(['message.text' => 'Hello'], fn() => say('Hello World 🌎'));
 Few? Some more examples:
 
 ```php 
-$bot->on('message.sticker', fn() => say('I love stickers! ❤'));
+$bot->on('message.sticker', fn() => say('I love stickers! ❤️'));
 ```
 ```php 
 $bot->on('message.voice', fn() => say('Whoops! I cannot yet listen 🙄'));
@@ -32,7 +32,7 @@ The first parameter `$data`, is a string or array that supports **dot notation**
 
 Execute event if the update has a `sticker` key in `message` array.
 ```php
-$bot->on('message.sticker', fn() => say('I love stickers! ❤'));
+$bot->on('message.sticker', fn() => say('I love stickers! ❤️'));
 ```
 
 Execute event if the update has a `sticker` or `voice` key in `message` array.
