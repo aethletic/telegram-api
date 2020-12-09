@@ -151,7 +151,7 @@ action('upload_photo')
 
 **Available actions:**
 
-`typing` for text messages, `upload_photo` for photos, `record_video` or `upload_video` for videos, `record_voice` or `upload_voice` for `voice notes`, `upload_document` for general files, `find_location` for location data, `record_video_note` or `upload_video_note` for video notes
+`typing` for text messages, `upload_photo` for photos, `record_video` or `upload_video` for videos, `record_voice` or `upload_voice` for voice notes, `upload_document` for general files, `find_location` for location data, `record_video_note` or `upload_video_note` for video notes
 
 ---
 
@@ -197,6 +197,10 @@ $active = $bot->isActive(1234567890);
 ---
 
 #### `sendChatAction($chatId, $action = 'typing', $extra = []) : Response`
+
+**Available actions:**
+
+`typing` for text messages, `upload_photo` for photos, `record_video` or `upload_video` for videos, `record_voice` or `upload_voice` for voice notes, `upload_document` for general files, `find_location` for location data, `record_video_note` or `upload_video_note` for video notes
 
 ---
 
