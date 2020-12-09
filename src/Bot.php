@@ -94,7 +94,13 @@ class Bot
     private $log;
 
     /**
+     * @var State
+     */
+    private $state;
+
+    /**
      * @param string $token
+     * @param array $config
      */
     public function create(string $token = null, array $config = [])
     {
@@ -118,7 +124,7 @@ class Bot
         // база данных
         if ($this->config('database.enable')) {
             $this->db = Connector::create();
-            // TODO вынести все в run чтобы при вебхуке не томрозило
+            // TODO вынести все в run чтобы при вебхуке не тормозило
             if ($this->config('database.collect_statistics') && $this->isUpdate()) {
                 Statistics::collect();
             }
@@ -184,7 +190,7 @@ class Bot
             return false;
         }
         return !$table ? $this->db : $this->db->table($table);
-    }
+    } 
 
     public function state($name = null, $data = null)
     {
@@ -289,7 +295,7 @@ class Bot
         $data = data_get($this->update->toArray(), $key, $default);
         $data = is_array($data) ? array_filter($data) : $data;
         return is_array($data) && count($data) > 1 ? collect($data) : (is_array($data) && $data !== [] ? head($data) : ($data == [] ? $default : $data));
-    }
+    } 
 
     /**
      * Alias for `update` method.
@@ -388,6 +394,8 @@ class Bot
 
     public function setUpdate($update = null, $isJson = false)
     {
+        $this->startTime = microtime(true);
+        
         if ($update) {
             $this->update = $isJson ? collect(json_decode($update, true)) : collect($update);
             $this->decodeCallback();
@@ -477,6 +485,50 @@ class Bot
     public function mapOnce($method, $func)
     {
         $this->mappedMethods[$method] = $this->execute($func);
+    }
+
+    public function adminAuth($password)
+    {
+        if (!$this->isAdmin()) {
+            return false;
+        }
+
+        $username = $this->update('*.from.username');
+        $userId = $this->update('*.from.id');
+        return $password == $this->config("admin.list.{$username}", $this->config("admin.list.{$userId}", false));
+    }
+
+    public function getSystemLoad()
+    {
+      return sys_getloadavg();
+    }
+
+    public function sendJson()
+    {
+        if (!$this->isUpdate()) {
+          return false;
+        }
+
+        return $this->request('sendMessage',[
+            'chat_id' => $this->update('*.chat.id'),
+            'text' => '<code>'.json_encode($this->update->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE).'</code>',
+        ]);
+    }
+
+    public function parse($delimiter = ' ')
+    {
+        if ($this->isCallback()) {
+            return explode($delimiter, $this->update('*.data'));
+        } else if ($this->isInline()) {
+            return explode($delimiter, $this->update('*.query'));
+        } else if ($this->isMessage() || $this->isEditedMessage() || $this->isCommand()) {
+            return explode($delimiter, $this->update('*.text'));
+        }
+    }
+
+    public function time($lenght = 6)
+    {
+        return round(microtime(true) - $this->startTime, $lenght);
     }
 
     public function __call($method, $args)

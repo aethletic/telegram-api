@@ -31,10 +31,8 @@ class State
 
         $this->currentUserId = $this->bot->user()->get('user_id');
 
-        if ($state = $this->get()) {
-            $this->name = $state->state_name;
-            $this->data = $state->state_name;
-        }
+        $this->name = $this->bot->user()->get('state_name');
+        $this->data = $this->bot->user()->get('state_data');
     }
 
     public function get()
@@ -56,6 +54,11 @@ class State
         $this->setById($this->currentUserId, $name, $data);
         $this->name = $name;
         $this->data = $data;
+    }
+
+    public function save()
+    {
+        $this->setById($this->currentUserId, $this->name, $this->data);
     }
 
     public function setById($userId, $name = null, $data = null)
@@ -87,21 +90,21 @@ class State
                     ]);
     }
 
-    public function name($name)
+    public function setName($name)
     {
         return $this->db
                     ->table('users')
-                    ->where('user_id', $this->bot->from->id)
+                    ->where('user_id', $this->currentUserId)
                     ->update([
                         'state_name' => $name,
                     ]);
     }
 
-    public function data($data)
+    public function setData($data)
     {
         return $this->db
                     ->table('users')
-                    ->where('user_id', $this->bot->from->id)
+                    ->where('user_id', $this->currentUserId)
                     ->update([
                         'state_data' => $data,
                     ]);

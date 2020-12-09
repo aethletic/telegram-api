@@ -7,6 +7,7 @@ trait Router
     private $middlewares = [];
     private $middlewarePassed = null;
     private $middlewareCurrent = null;
+    private $stateCurrent = null;
 
     private $defaultBotAnswer = null;
     private $defaultBotMessageAnswer = null;
@@ -15,21 +16,21 @@ trait Router
 
     private $queue = [];
 
-    private function check()
-    {
-        if (!$this->checkMiddleware()) {
-            return false;
-        }
+    // private function check()
+    // {
+    //     if (!$this->checkMiddleware()) {
+    //         return false;
+    //     }
 
-        return true;
-    }
+    //     if (!$this->checkState()) {
+    //         return false;
+    //     }
+
+    //     return true;
+    // }
 
     public function on($data, $func)
     {
-        // if (!$this->check()) {
-        //     return false;
-        // }
-
         foreach ((array) $data as $key => $value) {
 
             /**
@@ -53,6 +54,7 @@ trait Router
                 $this->queue[] = [
                     'func' => $func,
                     'middleware' => $this->middlewareCurrent,
+                    'state' => $this->stateCurrent,
                 ];
                 return;
             }
@@ -70,6 +72,7 @@ trait Router
                 $this->queue[] = [
                     'func' => $func,
                     'middleware' => $this->middlewareCurrent,
+                    'state' => $this->stateCurrent,
                 ];
                 return;
             }
@@ -82,6 +85,7 @@ trait Router
                     $this->queue[] = [
                         'func' => $func,
                         'middleware' => $this->middlewareCurrent,
+                        'state' => $this->stateCurrent,
                     ];
                     return;
                 }
@@ -89,6 +93,7 @@ trait Router
         }
 
         $this->middlewareCurrent = null;
+        $this->stateCurrent = null;
     }
 
     public function setDefaultAnswer($func)
@@ -138,6 +143,10 @@ trait Router
             $passed = true;
             if ($event['middleware']) {
                 $passed = $this->checkMiddleware($event['middleware']);
+            }
+
+            if ($event['state']) {
+                $passed = $this->checkState($event['state']);
             }
 
             // если не прошел проверку, пропускаем событие
@@ -196,7 +205,8 @@ trait Router
         $this->middlewareCurrent = $middlewares;
         return $this;
     }
-
+    
+    // TODO: переделать 
     private function checkMiddleware($middleware = [])
     {
         foreach ((array) $middleware as $item) {
@@ -225,6 +235,48 @@ trait Router
 
         $next = $this->middlewarePassed;
         $this->middlewarePassed = null;
+
+        return $next;
+    }
+
+    public function onState($names, $stopWords = false)
+    {
+        $this->stateCurrent = [
+            'names' => (array) $names,
+            'stopWords' => $stopWords,
+        ];
+
+        return $this;
+    }
+
+    // TODO: переделать 
+    private function checkState($state)
+    {
+        $names = $state['names'];
+        $stopWords = $state['stopWords'];
+
+        if ($stopWords) {
+            $stopWords = (array) $stopWords;
+        }
+
+        if (in_array($this->state()->name, $names)) {
+            if ($stopWords && in_array($this->isMessage() ? $this->update('*.text', []) : $this->update('*.data', []), $stopWords)) {
+                $this->statePassed = false;
+            } else {
+                $this->statePassed = true;
+            }
+        } else {
+            $this->statePassed = false;
+        }
+
+        $this->stateCurrent = null;
+
+        if ($this->statePassed === null) {
+            return true;
+        }
+
+        $next = $this->statePassed;
+        $this->statePassed = null;
 
         return $next;
     }

@@ -251,4 +251,20 @@ trait Events
 
         return $this->user()->isUpdated;
     }
+
+    public function isAdmin() {
+        $adminList = $this->config('admin.list', [])->toArray();
+        if (array_key_exists($this->update('*.from.id'), $adminList) || array_key_exists($this->update('*.from.id'), $adminList)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function onMaxSystemLoad($func)
+    {
+      $load = $this->getSystemLoad();
+      if ($load[0] > $this->config('general.max_system_load')) {
+        $this->executeFunction($func, [$load]);
+      }
+    }
 }
