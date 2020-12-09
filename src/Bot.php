@@ -451,7 +451,7 @@ class Bot
                     }
 
                     if ($this->config('database.user_auto_update.enable') && strtolower($this->config('database.user_auto_update.method', 'after'))) {
-                        $this->user()->autoUpdateUserData();
+                        $this->user()->autoUpdateUserInfo();
                     }
                 }
 

@@ -18,7 +18,7 @@ class User
     public $isUpdated = false;
 
     // новое значение из апдейта при авто-обновлении юзера
-    public $changedUserData = null;
+    public $changedUserInfo = null;
 
     public function __construct($userId = false, $inserteUserIfNotExists = false)
     {
@@ -50,7 +50,7 @@ class User
             $this->isBanned = $this->data->get('banned') == 1;
 
             if ($this->bot->config('database.user_auto_update.enable') && strtolower($this->bot->config('database.user_auto_update.method', 'before'))) {
-                $this->autoUpdateUserData();
+                $this->autoUpdateUserInfo();
             }
 
             return;
@@ -174,7 +174,7 @@ class User
         }
     }
 
-    public function autoUpdateUserData()
+    public function autoUpdateUserInfo()
     {
         $fromData = Arr::only($this->bot->update('*.from'), ['username', 'first_name', 'last_name']);
         $data = array_values(array_filter(Arr::only($this->data->toArray(), ['username', 'firstname', 'lastname'])));
@@ -188,9 +188,14 @@ class User
                     'lastname' => @$fromData['last_name'],
                 ]);
                 $this->isUpdated = true;
-                $this->changedUserData = $from[$key];
+                $this->changedUserInfo = $from[$key];
                 break;
             }
         }
+    }
+
+    public function getNewUserInfo()
+    {
+        return $this->changedUserInfo;
     }
 }
