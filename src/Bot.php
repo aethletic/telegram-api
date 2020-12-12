@@ -477,16 +477,6 @@ class Bot
         return self::TELEGRAM_API_URL . "{$this->token}/{$method}";
     }
 
-    public function map($method, $func)
-    {
-        $this->mappedMethods[$method] = $func;
-    }
-
-    public function mapOnce($method, $func)
-    {
-        $this->mappedMethods[$method] = $this->execute($func);
-    }
-
     public function adminAuth($password)
     {
         if (!$this->isAdmin()) {
@@ -531,6 +521,16 @@ class Bot
         return round(microtime(true) - $this->startTime, $lenght);
     }
 
+    public function map($method, $func)
+    {
+        $this->mappedMethods[$method] = $func;
+    }
+
+    public function mapOnce($method, $func)
+    {
+        $this->mappedMethods[$method] = $this->execute($func);
+    }
+    
     public function __call($method, $args)
     {
         $tmp = $this->mappedMethods[$method];
