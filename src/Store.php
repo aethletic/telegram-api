@@ -15,8 +15,8 @@ class Store
 
     public function __construct($config)
     {
-        $this->driver = strtolower($config['driver']) ?? null;
-        $this->dir = rtrim($config['file']['dir'], '\/') ?? null;
+        $this->driver = strtolower($config['driver'] ?? null);
+        $this->dir = rtrim($config['file']['dir'] ?? null, '\/');
 
         if ($this->driver == 'database') {
             $this->db = Bot::getInstance()->db('store');
