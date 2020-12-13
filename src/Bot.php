@@ -247,8 +247,8 @@ class Bot
                 continue;
             }
 
-            if (file_exists($component['entry_point'] ?? null)) {
-                require_once $component['entry_point'];
+            if (file_exists($component['entrypoint'] ?? null)) {
+                require_once $component['entrypoint'];
             }
         }
     }

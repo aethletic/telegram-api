@@ -1,0 +1,15 @@
+<?php
+
+require __DIR__ . '/../../vendor/autoload.php';
+
+// Init our bot
+$bot = bot('1234567890:ABC_TOKEN');
+
+// Use long polling instead webhook
+$bot->longpoll(function (\Telegram\Bot $bot) {
+    // Catch all `message` and `edit_message`, beacouse only they have `*.text` key.
+    $bot->on('*', function () {
+        // And now, get come `text` from update and send to user
+        say(update('*.text', 'default answer if *.text not exists'));
+    });
+});
