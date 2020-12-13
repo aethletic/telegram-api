@@ -16,19 +16,6 @@ trait Router
 
     private $queue = [];
 
-    // private function check()
-    // {
-    //     if (!$this->checkMiddleware()) {
-    //         return false;
-    //     }
-
-    //     if (!$this->checkState()) {
-    //         return false;
-    //     }
-
-    //     return true;
-    // }
-
     public function on($data, $func)
     {
         foreach ((array) $data as $key => $value) {
@@ -50,7 +37,6 @@ trait Router
              * ['*.text', '*.sticker']
              */
             if (is_numeric($key) && $this->update($value, false)) {
-                // return $this->execute($func);
                 $this->queue[] = [
                     'func' => $func,
                     'middleware' => $this->middlewareCurrent,
@@ -68,7 +54,6 @@ trait Router
             }
 
             if ($found == $value) {
-                // return $this->execute($func);
                 $this->queue[] = [
                     'func' => $func,
                     'middleware' => $this->middlewareCurrent,
@@ -81,7 +66,6 @@ trait Router
             if ($this->helper->isRegEx($value)) {
                 preg_match($value, $found, $matches);
                 if (sizeof($matches) > 0) {
-                    // return $this->execute($func);
                     $this->queue[] = [
                         'func' => $func,
                         'middleware' => $this->middlewareCurrent,
@@ -118,27 +102,30 @@ trait Router
         if ($this->queue === [] && !$this->isSpam()) {
             if ($this->isMessage() && !$this->isCommand() && !is_null($this->defaultBotMessageAnswer)) {
                 $this->execute($this->defaultBotMessageAnswer);
+                $this->collectStatistics();
                 return $this->autoLogWrite('AUTO_DEFAULT_MESSAGE_ANSWER');
             }
 
             if ($this->isCommand() && !is_null($this->defaultBotCommandAnswer)) {
                 $this->execute($this->defaultBotCommandAnswer);
+                $this->collectStatistics();
                 return $this->autoLogWrite('AUTO_DEFAULT_COMMAND_ANSWER');
             }
 
             if ($this->isCallback() && !is_null($this->defaultBotCallbackAnswer)) {
                 $this->execute($this->defaultBotCallbackAnswer);
+                $this->collectStatistics();
                 return $this->autoLogWrite('AUTO_DEFAULT_CALLBACK_ANSWER');
             }
 
             if (!is_null($this->defaultBotAnswer)) {
                 $this->execute($this->defaultBotAnswer);
+                $this->collectStatistics();
                 return $this->autoLogWrite('AUTO_DEFAULT_ANSWER');
             }
         }
 
         foreach ($this->queue as $event) {
-
             // если есть middleware, выполняем проверку
             $passed = true;
             if ($event['middleware']) {
@@ -161,6 +148,7 @@ trait Router
         // очищаем очередь, актуально для лонгпула
         $this->queue = [];
         $this->autoLogWrite('AUTO');
+        $this->collectStatistics();
     }
 
     public function hear($messages, $func)

@@ -105,7 +105,7 @@ class Bot
     public function create(string $token = null, array $config = [])
     {
         if (!$token) {
-            new BotException("Please, pass your bot token.");
+            throw new BotException("Please, pass your bot token.");
         }
 
         $this->token = $token;
@@ -124,10 +124,6 @@ class Bot
         // база данных
         if ($this->config('database.enable')) {
             $this->db = Connector::create();
-            // TODO вынести все в run чтобы при вебхуке не тормозило
-            if ($this->config('database.collect_statistics') && $this->isUpdate()) {
-                Statistics::collect();
-            }
 
             if ($this->isUpdate()) {
                 $this->user = new User($this->update('*.from.id'), true);
@@ -250,6 +246,13 @@ class Bot
             if (file_exists($component['entrypoint'] ?? null)) {
                 require_once $component['entrypoint'];
             }
+        }
+    }
+
+    private function collectStatisctics()
+    {
+        if ($this->config('database.collect_statistics') && $this->config('database.enable') && $this->isUpdate()) {
+            Statistics::collect();
         }
     }
 
