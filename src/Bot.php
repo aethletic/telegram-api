@@ -249,7 +249,7 @@ class Bot
         }
     }
 
-    private function collectStatisctics()
+    private function collectStatistics()
     {
         if ($this->config('database.collect_statistics') && $this->config('database.enable') && $this->isUpdate()) {
             Statistics::collect();
