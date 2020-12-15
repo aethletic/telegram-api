@@ -130,8 +130,6 @@ class Bot
             }
         }
 
-        
-
         // локализация
         $this->lang = $this->isUpdate() ? (new Localization())->autoload() : new Localization();
 
