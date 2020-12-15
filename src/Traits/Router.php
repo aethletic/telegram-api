@@ -20,6 +20,16 @@ trait Router
     {
         foreach ((array) $data as $key => $value) {
 
+            if ($value == '{any}') {
+                $this->queue[] = [
+                    'val' => $value,
+                    'func' => $func,
+                    'middleware' => $this->middlewareCurrent,
+                    'state' => $this->stateCurrent,
+                ];
+                break;
+            }
+
             /**
              * Формат: 
              * [
@@ -38,11 +48,12 @@ trait Router
              */
             if (is_numeric($key) && $this->update($value, false)) {
                 $this->queue[] = [
+                    'val' => $value,
                     'func' => $func,
                     'middleware' => $this->middlewareCurrent,
                     'state' => $this->stateCurrent,
                 ];
-                return;
+                break;
             }
 
             /**
@@ -55,11 +66,12 @@ trait Router
 
             if ($found == $value) {
                 $this->queue[] = [
+                    'val' => $value,
                     'func' => $func,
                     'middleware' => $this->middlewareCurrent,
                     'state' => $this->stateCurrent,
                 ];
-                return;
+                break;
             }
 
             // regex
@@ -67,11 +79,12 @@ trait Router
                 preg_match($value, $found, $matches);
                 if (sizeof($matches) > 0) {
                     $this->queue[] = [
+                        'val' => $value,
                         'func' => $func,
                         'middleware' => $this->middlewareCurrent,
                         'state' => $this->stateCurrent,
                     ];
-                    return;
+                    break;
                 }
             }
         }
@@ -97,33 +110,43 @@ trait Router
         $this->defaultBotCallbackAnswer = $func;
     }
 
+    private function executeDefaults() {
+        if ($this->isMessage() && !$this->isCommand() && !is_null($this->defaultBotMessageAnswer)) {
+            $this->execute($this->defaultBotMessageAnswer);
+            $this->collectStatistics();
+            return $this->autoLogWrite('AUTO_DEFAULT_MESSAGE_ANSWER');
+        }
+
+        if ($this->isCommand() && !is_null($this->defaultBotCommandAnswer)) {
+            $this->execute($this->defaultBotCommandAnswer);
+            $this->collectStatistics();
+            return $this->autoLogWrite('AUTO_DEFAULT_COMMAND_ANSWER');
+        }
+
+        if ($this->isCallback() && !is_null($this->defaultBotCallbackAnswer)) {
+            $this->execute($this->defaultBotCallbackAnswer);
+            $this->collectStatistics();
+            return $this->autoLogWrite('AUTO_DEFAULT_CALLBACK_ANSWER');
+        }
+
+        if (!is_null($this->defaultBotAnswer)) {
+            $this->execute($this->defaultBotAnswer);
+            $this->collectStatistics();
+            return $this->autoLogWrite('AUTO_DEFAULT_ANSWER');
+        }
+    }
+
     public function run()
     {
+        print_r($this->queue);
+        $this->middlewareCurrent = null;
+        $this->stateCurrent = null;
+
         if ($this->queue === [] && !$this->isSpam()) {
-            if ($this->isMessage() && !$this->isCommand() && !is_null($this->defaultBotMessageAnswer)) {
-                $this->execute($this->defaultBotMessageAnswer);
-                $this->collectStatistics();
-                return $this->autoLogWrite('AUTO_DEFAULT_MESSAGE_ANSWER');
-            }
-
-            if ($this->isCommand() && !is_null($this->defaultBotCommandAnswer)) {
-                $this->execute($this->defaultBotCommandAnswer);
-                $this->collectStatistics();
-                return $this->autoLogWrite('AUTO_DEFAULT_COMMAND_ANSWER');
-            }
-
-            if ($this->isCallback() && !is_null($this->defaultBotCallbackAnswer)) {
-                $this->execute($this->defaultBotCallbackAnswer);
-                $this->collectStatistics();
-                return $this->autoLogWrite('AUTO_DEFAULT_CALLBACK_ANSWER');
-            }
-
-            if (!is_null($this->defaultBotAnswer)) {
-                $this->execute($this->defaultBotAnswer);
-                $this->collectStatistics();
-                return $this->autoLogWrite('AUTO_DEFAULT_ANSWER');
-            }
+            return $this->executeDefaults();
         }
+
+        $hasOneExecuted = false;
 
         foreach ($this->queue as $event) {
             // если есть middleware, выполняем проверку
@@ -143,10 +166,17 @@ trait Router
 
             // выполняем функцию события
             $this->execute($event['func']);
+
+            $hasOneExecuted = true;
         }
 
         // очищаем очередь, актуально для лонгпула
         $this->queue = [];
+
+        if (!$hasOneExecuted) {
+            return $this->executeDefaults();
+        }
+
         $this->autoLogWrite('AUTO');
         $this->collectStatistics();
     }
@@ -161,6 +191,8 @@ trait Router
                 return $this->on($data, $func);
             }
         }
+        $this->middlewareCurrent = null;
+        $this->stateCurrent = null;
     }
 
     public function command($messages, $func)
@@ -171,6 +203,8 @@ trait Router
             })->toArray();
             return $this->on($data, $func);
         }
+        $this->middlewareCurrent = null;
+        $this->stateCurrent = null;
     }
 
     public function callback($messages, $func)
@@ -181,6 +215,8 @@ trait Router
             })->toArray();
             return $this->on($data, $func);
         }
+        $this->middlewareCurrent = null;
+        $this->stateCurrent = null;
     }
 
     public function addMiddleware($name, $func)
@@ -227,7 +263,7 @@ trait Router
         return $next;
     }
 
-    public function onState($names, $stopWords = false)
+    public function onState($names, $stopWords = null)
     {
         $this->stateCurrent = [
             'names' => (array) $names,
