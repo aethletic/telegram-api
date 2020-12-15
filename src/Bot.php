@@ -127,9 +127,10 @@ class Bot
 
             if ($this->isUpdate()) {
                 $this->user = new User($this->update('*.from.id'), true);
-                $this->state = new State;
             }
         }
+
+        
 
         // локализация
         $this->lang = $this->isUpdate() ? (new Localization())->autoload() : new Localization();
@@ -146,7 +147,8 @@ class Bot
 
         // store в самом конце т.к. он может зависеть от бд, в перспективе от кеша?
         $this->store = new Store($this->config()->get('store'));
-
+        $this->state = new State;
+       
         $this->loadComponents();
 
         return $this;
@@ -434,8 +436,9 @@ class Bot
                  */
                 if (!is_null($this->db)) {
                     $this->user = new User($this->update('*.from.id'), true);
-                    $this->state = new State;
                 }
+
+                $this->state = new State;
 
                 $this->lang = (new Localization)->autoload();
 

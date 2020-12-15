@@ -65,6 +65,11 @@ return [
         'database' => [],
         'ram' => [],
     ],
+    'state' => [
+        'driver' => 'store',
+        'store' => [],
+        'database' => [],
+    ],
     'localization' => [
         'default_language' => 'ru',
         'dir' => __DIR__ . '/localization',
