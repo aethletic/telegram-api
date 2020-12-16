@@ -136,6 +136,17 @@ if (!function_exists('store')) {
     }
 }
 
+if (!function_exists('state')) {
+    function state($name = null, $data = false)
+    {
+        if ($name || $data) {
+            return Bot::getInstance()->state()->set($name, $data);
+        }
+
+        return Bot::getInstance()->state();
+    }
+}
+
 if (!function_exists('user')) {
     function user($userId = null)
     {
