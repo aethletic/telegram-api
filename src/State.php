@@ -74,8 +74,6 @@ class State
     public function set($name = null, $data = null)
     {
         $this->setById($this->currentUserId, $name, $data);
-        $this->name = $name;
-        $this->data = $data;
     }
 
     public function save()
@@ -108,8 +106,6 @@ class State
     public function clear()
     {
         $this->clearById($this->currentUserId);
-        $this->name = null;
-        $this->data = null;
     }
 
     public function clearById($userId)
