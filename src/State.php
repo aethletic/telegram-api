@@ -34,19 +34,28 @@ class State
 
         switch ($this->driver) {
             case 'store':
-                $this->currentUserId = $this->bot->update('*.form.id');
-                $state = $this->getById($this->currentUserId);
-                $this->name = $state['state_name'] ?? null;
-                $this->data = $state['state_data'] ?? null;
+                $this->setDataFromUpdate();
                 break;
             
             case 'database':
                 $this->db = $this->bot->db();
-                $this->currentUserId = $this->bot->user()->get('user_id');
-                $this->name = $this->bot->user()->get('state_name');
-                $this->data = $this->bot->user()->get('state_data');
+                if ($this->bot->user()) {
+                    $this->currentUserId = $this->bot->user()->get('user_id');
+                    $this->name = $this->bot->user()->get('state_name');
+                    $this->data = $this->bot->user()->get('state_data');
+                } elseif ($this->bot->isUpdate()) {
+                    $this->setDataFromUpdate();
+                }
                 break;
         }
+    }
+
+    private function setDataFromUpdate()
+    {
+        $this->currentUserId = $this->bot->update('*.form.id');
+        $state = $this->getById($this->currentUserId);
+        $this->name = $state['state_name'] ?? null;
+        $this->data = $state['state_data'] ?? null;
     }
 
     public function get()

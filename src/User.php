@@ -114,7 +114,7 @@ class User
             'version' => $this->bot->config('bot.version'), // последняя версия бота с которой взаимодействовал юзер
         ];
 
-        $data = array_merge($data, $this->bot->config('database.user_fields'));
+        $data = array_merge($data, $this->bot->config()->get('database')['user_fields']);
         
         $this->db
             ->table('users')

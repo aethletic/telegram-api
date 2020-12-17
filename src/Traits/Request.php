@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Telegram\Traits;
 
@@ -15,7 +15,7 @@ trait Request
 
         $this->curl->post($this->getRequestUrl($method), $params);
 
-         if ($this->curl->error) {
+        if ($this->curl->error) {
             echo "\n\nError code " . $this->curl->errorCode . ': ' . $this->curl->errorMessage . "\n\n";
             var_dump($this->getRequestUrl($method), $params);
         } else {

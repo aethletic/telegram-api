@@ -13,6 +13,7 @@ trait Router
     private $defaultBotMessageAnswer = null;
     private $defaultBotCommandAnswer = null;
     private $defaultBotCallbackAnswer = null;
+    private $defaultBotInlinekAnswer = null;
 
     private $queue = [];
 
@@ -109,6 +110,10 @@ trait Router
     {
         $this->defaultBotCallbackAnswer = $func;
     }
+    public function setDefaultInlineAnswer($func)
+    {
+        $this->defaultBotInlineAnswer = $func;
+    }
 
     private function executeDefaults() {
         if ($this->isMessage() && !$this->isCommand() && !is_null($this->defaultBotMessageAnswer)) {
@@ -129,6 +134,12 @@ trait Router
             return $this->autoLogWrite('AUTO_DEFAULT_CALLBACK_ANSWER');
         }
 
+        if ($this->isInline() && !is_null($this->defaultBotInlineAnswer)) {
+            $this->execute($this->defaultBotInlineAnswer);
+            $this->collectStatistics();
+            return $this->autoLogWrite('AUTO_DEFAULT_INLINE_ANSWER');
+        }
+
         if (!is_null($this->defaultBotAnswer)) {
             $this->execute($this->defaultBotAnswer);
             $this->collectStatistics();
@@ -138,7 +149,6 @@ trait Router
 
     public function run()
     {
-        print_r($this->queue);
         $this->middlewareCurrent = null;
         $this->stateCurrent = null;
 
@@ -212,6 +222,18 @@ trait Router
         if ($this->isCallback()) {
             $data = collect($messages)->map(function ($item) {
                 return ['callback_query.data' => $item];
+            })->toArray();
+            return $this->on($data, $func);
+        }
+        $this->middlewareCurrent = null;
+        $this->stateCurrent = null;
+    }
+
+    public function inline($messages, $func)
+    {
+        if ($this->isInline()) {
+            $data = collect($messages)->map(function ($item) {
+                return ['inline_query.query' => $item];
             })->toArray();
             return $this->on($data, $func);
         }

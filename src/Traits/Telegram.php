@@ -288,7 +288,7 @@ trait Telegram
     public function setMyCommands($commands)
     {
         return $this->request(__FUNCTION__, [
-            'commands' => $commands,
+            'commands' => json_encode($commands),
         ]);
     }
 
@@ -368,11 +368,11 @@ trait Telegram
         return $this->request(__FUNCTION__, $extra);
     }
 
-    public function answerInlineQuery($results = [], $extra = [])
+    public function answerInlineQuery(array $results = [], $extra = [])
     {
-        return $this->request(__FUNCTION__, $this->buildRequestParams([
-            'inline_query_id' => $this->inlineId,
+        return $this->request(__FUNCTION__, array_merge([
+            'inline_query_id' => $this->update('inline_query.id'),
             'results' => json_encode($results),
-        ], null, $extra));
+        ], $extra));
     }
 }
