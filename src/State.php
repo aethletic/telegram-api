@@ -140,7 +140,7 @@ class State
     {
         switch ($this->driver) {
             case 'store':
-                return Bot::getInstance()->store()->set($this->userStateFile($userId), serialize([
+                return Bot::getInstance()->store()->set($this->userStateFile($this->currentUserId), serialize([
                     'state_name' => $name, 
                 ]));
                 break;
@@ -160,7 +160,7 @@ class State
     {
         switch ($this->driver) {
             case 'store':
-                return Bot::getInstance()->store()->set($this->userStateFile($userId), serialize([
+                return Bot::getInstance()->store()->set($this->userStateFile($this->currentUserId), serialize([
                     'state_data' => $data,
                 ]));
                 break;

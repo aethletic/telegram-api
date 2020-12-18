@@ -42,7 +42,11 @@ class Localization
         $file = "{$path}/{$this->language}.php";
 
         if (!file_exists($file)) {
-            return $this;
+            $file = "{$path}/{$this->default}.php";
+            if (!file_exists($file)) {
+                return $this;
+            }
+            $this->load($file);
         }
 
         $this->data = require $file;
