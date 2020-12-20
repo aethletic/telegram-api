@@ -1,5 +1,9 @@
 # WIP: Telegram Bot Api Library
 
+```bash
+composer require aethletic/telegram-api
+```
+
 ### Example: Hello World
 
 Create your first `Hello World` bot:
