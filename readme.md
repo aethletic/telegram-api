@@ -13,9 +13,9 @@ require './vendor/autoload.php';
 
 $bot = bot('1234567890:ABC_TOKEN');
 
-$bot->longpoll(function (\Telegram\Bot $bot) {
-    $bot->hear('Hello', fn () => say('Hello World 👋'));
-});
+$bot->hear('Hello', fn () => say('Hello World 👋'));
+
+$bot->run();
 ```
 
 Run bot, type in terminal:
