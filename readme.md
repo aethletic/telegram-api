@@ -1,5 +1,7 @@
 # WIP: Telegram Bot Api Library
 
+### Installation
+
 ```bash
 composer require aethletic/telegram-api
 ```
