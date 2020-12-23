@@ -1,5 +1,7 @@
 # WIP: Telegram Bot Api Library
 
+Simple but powerful library for easy building bots.
+
 ### Installation
 
 ```bash
