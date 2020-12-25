@@ -23,18 +23,24 @@ class Statistics
         }
 
         // new users stats
-        // $isNewDate = $bot->db()->table('stats_new_users')->where('date', $date)->count() == 0;
-        // if ($bot->user->isNewUser) {
-        //     if ($isNewDate) {
-        //         $bot->db()->query("INSERT INTO stats_new_users (date, count) VALUES ({$date}, 1)");
-        //     } else {
-        //         $bot->db()->query("UPDATE stats_new_users SET count = count + 1 WHERE date = {$date}");
-        //     }
-        // } else {
-        //     if ($isNewDate) {
-        //         $bot->db()->query("INSERT INTO stats_new_users (date, count) VALUES ({$date}, 0)");
-        //     }
-        // }
+        $isNewDate = $bot->db()->table('stats_new_users')->where('date', $date)->count() == 0;
+        if ($bot->isNewUser()) {
+            if ($isNewDate) {
+                $bot->db('stats_new_users')->insert([
+                    'date' => $date,
+                    'count' => 1,
+                ]);
+            } else {
+                $bot->db('stats_new_users')->where('date', $date)->increment('count', 1);
+            }
+        } else {
+            if ($isNewDate) {
+                $bot->db('stats_new_users')->insert([
+                    'date' => $date,
+                    'count' => 0,
+                ]);
+            }
+        }
 
         $update = $bot->update();
 

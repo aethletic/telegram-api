@@ -450,10 +450,6 @@ class Bot
                  * После выполнения событий, чтобы не тормозить ответ бота
                  */
                 if (!is_null($this->db)) {
-                    if ($this->config('database.collect_statistics')) {
-                        Statistics::collect();
-                    }
-
                     if ($this->config('database.user_auto_update.enable') && strtolower($this->config('database.user_auto_update.method', 'after'))) {
                         $this->user()->autoUpdateUserInfo();
                     }

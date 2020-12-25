@@ -49,7 +49,7 @@ class User
 
             $this->isBanned = $this->data->get('banned') == 1;
 
-            if ($this->bot->config('database.user_auto_update.enable') && strtolower($this->bot->config('database.user_auto_update.method', 'before'))) {
+            if ($this->bot->config('database.user_auto_update.enable') && strtolower($this->bot->config('database.user_auto_update.method', 'after')) == 'before') {
                 $this->autoUpdateUserInfo();
             }
 
@@ -186,11 +186,18 @@ class User
                     'username' => @$fromData['username'],
                     'firstname' => @$fromData['first_name'],
                     'lastname' => @$fromData['last_name'],
+                    'active' => 1,
                 ]);
                 $this->isUpdated = true;
                 $this->changedUserInfo = $from[$key];
                 break;
             }
+        }
+        
+        if (!$this->isUpdated && $this->get('active') == 0) {
+            $this->update([
+                'active' => 1,
+            ]);
         }
     }
 

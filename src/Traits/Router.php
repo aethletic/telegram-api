@@ -153,7 +153,11 @@ trait Router
         $this->stateCurrent = null;
 
         if ($this->queue === [] && !$this->isSpam()) {
-            return $this->executeDefaults();
+            $this->executeDefaults();
+            if ($this->config('database.user_auto_update.enable') && strtolower($this->config('database.user_auto_update.method', 'after')) == 'before') {
+                $this->user()->autoUpdateUserInfo();
+            }
+            return;
         }
 
         $hasOneExecuted = false;
@@ -184,11 +188,19 @@ trait Router
         $this->queue = [];
 
         if (!$hasOneExecuted) {
-            return $this->executeDefaults();
+            $this->executeDefaults();
+            if ($this->config('database.user_auto_update.enable') && strtolower($this->config('database.user_auto_update.method', 'after')) == 'before') {
+                $this->user()->autoUpdateUserInfo();
+            }
+            return;
         }
 
         $this->autoLogWrite('AUTO');
         $this->collectStatistics();
+        
+        if ($this->config('database.user_auto_update.enable') && strtolower($this->config('database.user_auto_update.method', 'after')) == 'before') {
+            $this->user()->autoUpdateUserInfo();
+        }
     }
 
     public function hear($messages, $func)
