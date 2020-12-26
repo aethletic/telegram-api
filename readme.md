@@ -1,13 +1,5 @@
 # WIP: Telegram Bot Api Library
 
-Simple but powerful library for easy building bots.
-
-### Installation
-
-```bash
-composer require aethletic/telegram-api
-```
-
 ### Example: Hello World
 
 Create your first `Hello World` bot:
@@ -17,9 +9,14 @@ require './vendor/autoload.php';
 
 $bot = bot('1234567890:ABC_TOKEN');
 
-$bot->hear('Hello', fn () => say('Hello World 👋'));
+$bot->longpoll(function (\Telegram\Bot $bot) {
+    $bot->hear('Hello', fn () => say('Hello World 👋'));
+});
+```
 
-$bot->run();
+Run bot, type in terminal:
+```bash 
+php hello_world.php
 ```
 
 Now, open your bot in Telegram and send message `Hello`.

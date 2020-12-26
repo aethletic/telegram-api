@@ -82,10 +82,12 @@ trait Telegram
 
     public function isActive($chatId, $action = 'typing', $extra = [])
     {
-        return $this->request('sendChatAction', $this->buildRequestParams([
+        $response = $this->request('sendChatAction', $this->buildRequestParams([
             'chat_id' => $chatId,
             'action' => $action,
-        ], null, $extra))->get('ok', false);
+        ], null, $extra));
+
+        return !is_null($response) ? $response->get('ok') : false;
     }
 
     public function sendChatAction($chatId, $action = 'typing', $extra = [])
