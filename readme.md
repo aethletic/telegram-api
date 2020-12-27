@@ -1,5 +1,7 @@
 # WIP: Telegram Bot Api Library
 
+Simple way for building Telegram bots.
+
 ### Example: Hello World
 
 Create your first `Hello World` bot:
@@ -21,7 +23,7 @@ php hello_world.php
 
 Now, open your bot in Telegram and send message `Hello`.
 
-More awesome examples see [here](https://google.ru).
+More awesome examples see [here](https://github.com/aethletic/telegram-api/tree/master/examples).
 
 ### Documentation
 Documentation can be found [here](https://github.com/aethletic/telegram-api/tree/master/docs).
