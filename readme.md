@@ -2,7 +2,7 @@
 
 Simple way for building Telegram bots.
 
-### Example: Hello World
+## Example
 
 Create your first `Hello World` bot:
 
@@ -10,20 +10,13 @@ Create your first `Hello World` bot:
 require './vendor/autoload.php';
 
 $bot = bot('1234567890:ABC_TOKEN');
-
-$bot->longpoll(function (\Telegram\Bot $bot) {
-    $bot->hear('Hello', fn () => say('Hello World 👋'));
-});
-```
-
-Run bot, type in terminal:
-```bash 
-php hello_world.php
+$bot->hear('Hello', fn () => say('Hello World 👋'));
+$bot->run();
 ```
 
 Now, open your bot in Telegram and send message `Hello`.
 
 More awesome examples see [here](https://github.com/aethletic/telegram-api/tree/master/examples).
 
-### Documentation
+## Documentation
 Documentation can be found [here](https://github.com/aethletic/telegram-api/tree/master/docs).
