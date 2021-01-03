@@ -4,7 +4,7 @@ Simple way for building Telegram bots.
 
 ## Example
 
-Create your first `Hello World` bot:
+Create your first `Hello World` bot based on Webhook:
 
 ```php
 require './vendor/autoload.php';
@@ -13,8 +13,6 @@ $bot = bot('1234567890:ABC_TOKEN');
 $bot->hear('Hello', fn () => say('Hello World 👋'));
 $bot->run();
 ```
-
-Now, open your bot in Telegram and send message `Hello`.
 
 More awesome examples see [here](https://github.com/aethletic/telegram-api/tree/master/examples).
 
