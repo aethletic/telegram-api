@@ -2,6 +2,8 @@
 
 Simple way for building Telegram bots.
 
+# No longer supported and considered abandoned.
+
 ## Example
 
 Create your first `Hello World` bot based on Webhook:
