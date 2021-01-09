@@ -1,4 +1,4 @@
-# WIP: Telegram Bot Api Library
+# Abandoned: Telegram Bot Api Library
 
 Simple way for building Telegram bots.
 
