@@ -178,6 +178,6 @@ class State
 
     private function userStateFile($userId)
     {
-        return md5("{userId}__USER__STATE__FILE");
+        return md5("{$userId}__USER__STATE__FILE");
     }
 }
