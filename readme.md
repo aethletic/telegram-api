@@ -3,6 +3,7 @@
 Simple way for building Telegram bots.
 
 # No longer supported and considered abandoned.
+# Use [PHP Telegram Bot API](https://github.com/aethletic/telegram-bot-api)
 
 ## Example
 
